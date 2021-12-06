@@ -20,7 +20,7 @@ jobs:
                   name: Install ZX config
                   command: |
                       # Call ZX script to generate a JSON file containing the pipeline parameters: /tmp/parameters.json 
-                      npx zx@4 ./.circleci/scripts/build-execution-plan.mjs --quiet
+                      npx zx@4 ./.circleci/scripts/build-execution-plan.mjs
             - continuation/continue:
                   configuration_path: .circleci/continue_config.yml
                   parameters: /tmp/parameters.json
