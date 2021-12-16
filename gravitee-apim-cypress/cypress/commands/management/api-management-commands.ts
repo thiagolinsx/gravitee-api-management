@@ -26,6 +26,16 @@ export function createApi(auth: BasicAuthentication, body: Api) {
   });
 }
 
+export function createPlan(auth: BasicAuthentication, body: Api, apiId: string) {
+  return cy.request({
+    method: 'POST',
+    url: `${Cypress.config().baseUrl}${Cypress.env('managementApi')}/apis/${apiId}/plans`,
+    body,
+    auth,
+    failOnStatusCode: false,
+  });
+}
+
 export function publishApi(auth: BasicAuthentication, apiId: string) {
   return cy.request({
     method: 'PUT',
