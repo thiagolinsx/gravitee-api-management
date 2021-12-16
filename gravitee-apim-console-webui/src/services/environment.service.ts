@@ -15,7 +15,7 @@
  */
 
 import { IHttpResponse } from 'angular';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { EnvironmentPermissions } from '../entities/environment/environmentPermissions';
 import { IdentityProviderActivation } from '../entities/identity-provider';

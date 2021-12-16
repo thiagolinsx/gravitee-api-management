@@ -15,7 +15,7 @@
  */
 import { StateService } from '@uirouter/core';
 import { IScope } from 'angular';
-import _ = require('lodash');
+import _ from 'lodash';
 
 import SidenavService from '../../components/sidenav/sidenav.service';
 import UserService from '../../services/user.service';

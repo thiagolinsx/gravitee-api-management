@@ -15,8 +15,8 @@
  */
 import { StateService } from '@uirouter/core';
 import { IQService, IRootScopeService, IScope } from 'angular';
-import * as _ from 'lodash';
-import * as moment from 'moment';
+import _ from 'lodash';
+import moment from 'moment';
 
 import { ApiService, LogsQuery } from '../../../../../services/api.service';
 import UserService from '../../../../../services/user.service';

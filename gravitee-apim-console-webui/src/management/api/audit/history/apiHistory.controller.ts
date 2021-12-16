@@ -21,7 +21,7 @@ const JsDiff = require('diff/dist/diff.min.js');
 import '@gravitee/ui-components/wc/gv-policy-studio';
 import '@gravitee/ui-components/wc/gv-switch';
 import '@gravitee/ui-components/wc/gv-popover';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as angular from 'angular';
 import { StateService } from '@uirouter/core';
 

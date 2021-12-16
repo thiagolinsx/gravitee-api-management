@@ -15,7 +15,7 @@
  */
 // eslint-disable-next-line
 /* global setInterval:false, clearInterval:false, screen:false */
-import angular = require('angular');
+import * as angular from 'angular';
 
 import EnvironmentService from '../services/environment.service';
 import PortalConfigService from '../services/portalConfig.service';

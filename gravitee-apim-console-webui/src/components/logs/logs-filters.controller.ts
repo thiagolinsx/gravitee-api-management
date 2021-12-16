@@ -15,7 +15,7 @@
  */
 import { StateService } from '@uirouter/core';
 import { ILogService, IScope, ITimeoutService } from 'angular';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 interface ILogsFiltersScope extends IScope {
   logsFiltersForm: any;

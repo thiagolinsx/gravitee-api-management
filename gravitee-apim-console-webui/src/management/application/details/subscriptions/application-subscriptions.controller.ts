@@ -16,7 +16,7 @@
 
 import { StateService } from '@uirouter/core';
 import * as angular from 'angular';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { PagedResult } from '../../../../entities/pagedResult';
 import { ApiService } from '../../../../services/api.service';

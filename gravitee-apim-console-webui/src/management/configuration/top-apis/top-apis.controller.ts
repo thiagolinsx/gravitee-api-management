@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { IScope } from 'angular';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import NotificationService from '../../../services/notification.service';
 import TopApiService from '../../../services/top-api.service';

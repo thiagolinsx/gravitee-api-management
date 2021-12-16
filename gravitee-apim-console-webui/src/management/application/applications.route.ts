@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { StateParams, StateService } from '@uirouter/core';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { ApplicationType } from '../../entities/application';
 import { ApiService } from '../../services/api.service';

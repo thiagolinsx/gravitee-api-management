@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { StateParams, StateService, TransitionService } from '@uirouter/core';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { ApiService } from '../../services/api.service';
 import UserService from '../../services/user.service';

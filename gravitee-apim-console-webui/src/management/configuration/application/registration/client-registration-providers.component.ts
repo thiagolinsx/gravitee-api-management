@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { StateService } from '@uirouter/core';
-import _ = require('lodash');
+import _ from 'lodash';
 
 import { ClientRegistrationProvider } from '../../../../entities/clientRegistrationProvider';
 import ClientRegistrationProviderService from '../../../../services/clientRegistrationProvider.service';

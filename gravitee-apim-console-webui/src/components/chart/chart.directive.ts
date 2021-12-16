@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import angular = require('angular');
+import * as angular from 'angular';
 import * as Highcharts from 'highcharts';
 import * as Highmaps from 'highcharts/highmaps';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import 'highcharts/modules/map';
 
 class ChartDirective {

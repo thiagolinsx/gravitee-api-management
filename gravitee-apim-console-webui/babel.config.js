@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 module.exports = {
+  presets: ['@babel/preset-env', ['@babel/env', { targets: ['last 2 versions'] }]],
   env: {
     test: {
       presets: [

@@ -16,7 +16,7 @@
 
 import { StateService } from '@uirouter/core';
 import { IScope } from 'angular';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { AuthProvider, SatellizerConfig } from 'satellizer';
 
 import RouterService from './router.service';

@@ -15,7 +15,7 @@
  */
 import { StateService } from '@uirouter/core';
 import { IOnDestroy, IOnInit, IRootScopeService } from 'angular';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import AnalyticsService from '../../services/analytics.service';
 

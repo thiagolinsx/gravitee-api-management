@@ -15,8 +15,8 @@
  */
 
 import { StateService } from '@uirouter/core';
-import angular = require('angular');
-import _ = require('lodash');
+import * as angular from 'angular';
+import _ from 'lodash';
 
 import { IdentityProvider } from '../../../entities/identity-provider/identityProvider';
 import IdentityProviderService from '../../../services/identityProvider.service';

@@ -16,8 +16,8 @@
 
 import { StateService } from '@uirouter/core';
 import { IController, IScope } from 'angular';
-import angular = require('angular');
-import _ = require('lodash');
+import * as angular from 'angular';
+import _ from 'lodash';
 
 import { emptyFetcher } from './edit-tabs/edit-page-fetchers.component';
 

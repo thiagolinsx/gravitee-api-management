@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as _ from 'lodash';
+import _ from 'lodash';
 // eslint:disable-next-line:no-var-requires
 require('@gravitee/ui-components/wc/gv-stats');
 const WidgetDataStatsComponent: ng.IComponentOptions = {

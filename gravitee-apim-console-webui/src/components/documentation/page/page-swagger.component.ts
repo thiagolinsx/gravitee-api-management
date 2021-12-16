@@ -15,9 +15,9 @@
  */
 import { StateService } from '@uirouter/core';
 import { IController } from 'angular';
-import angular = require('angular');
+import * as angular from 'angular';
 import * as jsyaml from 'js-yaml';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { SwaggerUIBundle } from 'swagger-ui-dist';
 
 import UserService from '../../../services/user.service';

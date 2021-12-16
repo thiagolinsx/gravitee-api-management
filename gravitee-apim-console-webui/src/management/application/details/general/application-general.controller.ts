@@ -15,7 +15,7 @@
  */
 
 import { StateService } from '@uirouter/core';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import SidenavService from '../../../../components/sidenav/sidenav.service';
 import ApplicationService from '../../../../services/application.service';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import _ = require('lodash');
+import _ from 'lodash';
 
 import { Metrics } from '../../../../../entities/alert';
 

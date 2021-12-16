@@ -15,8 +15,8 @@
  */
 import { StateService } from '@uirouter/core';
 import { IScope } from 'angular';
-import _ = require('lodash');
-import * as moment from 'moment';
+import _ from 'lodash';
+import moment from 'moment';
 
 import { PagedResult } from '../../../../entities/pagedResult';
 import { ApiService } from '../../../../services/api.service';

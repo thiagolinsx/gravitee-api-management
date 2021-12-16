@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { IController, IScope } from 'angular';
-import angular = require('angular');
+import * as angular from 'angular';
 
 interface IPageScope extends IScope {
   fetcherJsonSchema: {

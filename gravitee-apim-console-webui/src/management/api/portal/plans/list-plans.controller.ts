@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import { StateService } from '@uirouter/core';
-import angular = require('angular');
-import _ = require('lodash');
+import * as angular from 'angular';
+import _ from 'lodash';
 
 import { ApiService } from '../../../../services/api.service';
 import NotificationService from '../../../../services/notification.service';

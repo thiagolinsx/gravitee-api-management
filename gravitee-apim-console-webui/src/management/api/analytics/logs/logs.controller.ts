@@ -15,7 +15,7 @@
  */
 import { StateService } from '@uirouter/core';
 import { IScope } from 'angular';
-import _ = require('lodash');
+import _ from 'lodash';
 
 import AnalyticsService from '../../../../services/analytics.service';
 import { ApiService, LogsQuery } from '../../../../services/api.service';

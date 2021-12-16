@@ -15,7 +15,7 @@
  */
 import { StateService } from '@uirouter/core';
 import { IPromise } from 'angular';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { ApiService } from '../../../../services/api.service';
 import NotificationService from '../../../../services/notification.service';

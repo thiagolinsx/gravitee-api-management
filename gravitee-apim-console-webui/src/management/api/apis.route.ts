@@ -15,7 +15,7 @@
  */
 import { StateParams, StateService } from '@uirouter/core';
 import { StateProvider } from '@uirouter/angularjs';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { ApisController } from './apis.controller';
 

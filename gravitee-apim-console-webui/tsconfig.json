@@ -4,15 +4,19 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "incremental": true,
-    "lib": ["dom", "es2018"],
+    "lib": ["dom", "es2015", "es2016", "es2017", "es2018", "es2020", "es2019", "es6"],
     "noImplicitAny": false,
     "outDir": "dist-tsc",
     "removeComments": false,
     "skipLibCheck": true,
     "sourceMap": true,
-    "target": "ES5",
+    "target": "es2017",
+    "module": "ES6",
     "types": ["jest", "angular-mocks", "node"],
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true
   },
+  "allowSyntheticDefaultImports": true,
   "include": ["src/**/*.ts", "node_modules/@gravitee/ui-components"]
 }

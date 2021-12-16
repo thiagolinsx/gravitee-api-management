@@ -15,7 +15,7 @@
  */
 import { StateService } from '@uirouter/core';
 import { IScope } from 'angular';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { ApiService } from '../../../../services/api.service';
 import CategoryService from '../../../../services/category.service';

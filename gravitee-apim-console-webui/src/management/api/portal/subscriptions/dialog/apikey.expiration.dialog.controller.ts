@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as moment from 'moment';
+import moment from 'moment';
 
 function DialogApiKeyExpirationController($scope, $mdDialog, maxEndDate) {
   'ngInject';

@@ -47,10 +47,32 @@ module.exports = {
         use: ['to-string-loader', 'css-loader', 'sass-loader'],
       },
       { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+
+      {
+        type: 'javascript/auto',
+        test: /\.mjs$/,
+        include: /node_modules/,
+        use: [],
+      },
       {
         test: /\.ts$/,
         exclude: /node_modules/,
-        use: ['ng-annotate-loader', 'ts-loader'],
+        use: [
+          // { loader: 'ng-annotate-loader', options: { es6: true } },
+
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+            },
+          },
+        ],
+      },
+      {
+        type: 'javascript/auto',
+        test: /\.mjs$/,
+        include: /node_modules/,
+        use: [],
       },
       {
         test: /\.html$/i,

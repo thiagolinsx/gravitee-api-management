@@ -15,7 +15,7 @@
  */
 import { StateService } from '@uirouter/core';
 import { IScope } from 'angular';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import EntrypointService from '../../../services/entrypoint.service';
 import NotificationService from '../../../services/notification.service';
