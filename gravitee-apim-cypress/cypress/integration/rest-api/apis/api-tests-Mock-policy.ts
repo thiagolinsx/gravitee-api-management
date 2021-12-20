@@ -20,6 +20,7 @@ import { ApiFakers } from 'fixtures/fakers/apis';
 import { PlanFakers } from 'fixtures/fakers/plans';
 import { createApi, createPlan, deleteApi } from 'commands/management/api-management-commands';
 import { Api } from 'model/apis';
+import { SecurityType } from '@model/plan';
 
 context('API tests', () => {
   describe('Create APIs', function () {
@@ -41,7 +42,7 @@ context('API tests', () => {
 
     it('should create a keyless plan as admin user', function () {
       const fakePlan = PlanFakers.plan({security: SecurityType.KEY_LESS});
-      createPlan(ADMIN_USER, this.apiId, fakePlan).should(function (response) {
+      createPlan(ADMIN_USER, this.apiId, this.fakePlan).should(function (response) {
           expect(response.status).to.equal(201);
           expect(response.body).to.have.all.keys('name', 'id', 'description', 'validation', 'security', 'type', 'status', 'api', 'order', 'created_at', 'updated_at', 'paths', 'flows', 'comment_required');
           expect(response.body.security).to.equal('KEY_LESS');
@@ -84,4 +85,4 @@ context('API tests', () => {
   //     });
   //   });
   // });
-});
+// });

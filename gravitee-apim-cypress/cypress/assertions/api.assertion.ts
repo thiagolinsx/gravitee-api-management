@@ -48,6 +48,17 @@ export class ApiAssertions {
     return this;
   }
 
+  hasBeenStarted(expected: Api) {
+    this.hasId()
+      .hasState(ApiState.STARTED)
+      .hasVisibility(ApiVisibility.PRIVATE)
+      .hasLifecycleState(ApiLifecycleState.CREATED)
+      .hasName(expected.name)
+      .hasDescription(expected.description);
+    return this;
+  }
+
+
   hasId(expectedId?: string) {
     if (expectedId) {
       expect(this.api.id, 'has expected id').to.be.equal(expectedId);

@@ -15,7 +15,7 @@
  */
 export interface Api {
   id: string;
-  contextPath: string;
+  context_path: string;
   description: string;
   endpoint: string;
   name: string;

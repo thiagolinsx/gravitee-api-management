@@ -13,43 +13,95 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Api, ApiErrorCodes, ApiLifecycleState, PortalApi } from '@model/apis';
-import { User, BasicAuthentication } from '@model/users';
+import { Api, ApiErrorCodes, ApiLifecycleState, PortalApi } from 'model/apis';
+import { NewPlanEntity } from 'model/plan';
+import { User, BasicAuthentication } from 'model/users';
 
-export function createApi(auth: BasicAuthentication, body: Api) {
+export function createApi(auth: BasicAuthentication, body: Api, failOnStatusCode = false) {
   return cy.request({
     method: 'POST',
     url: `${Cypress.config().baseUrl}${Cypress.env('managementApi')}/apis`,
     body,
     auth,
-    failOnStatusCode: false,
+    failOnStatusCode,
   });
 }
 
-export function createPlan(auth: BasicAuthentication, body: Api, apiId: string) {
-  return cy.request({
-    method: 'POST',
-    url: `${Cypress.config().baseUrl}${Cypress.env('managementApi')}/apis/${apiId}/plans`,
-    body,
-    auth,
-    failOnStatusCode: false,
-  });
-}
-
-export function publishApi(auth: BasicAuthentication, apiId: string) {
+export function publishApi(auth: BasicAuthentication, apiId: string, api: Api, failOnStatusCode = false) {
+  // const apiToPublish = {
+  //   ...createdApi,
+  //   lifecycle_state: ApiLifecycleState.PUBLISHED,
+  // };
+  api.lifecycle_state = ApiLifecycleState.PUBLISHED;
   return cy.request({
     method: 'PUT',
     url: `${Cypress.config().baseUrl}${Cypress.env('managementApi')}/apis/${apiId}`,
+    body: api,
     auth,
-    failOnStatusCode: false,
+    failOnStatusCode,
   });
 }
 
-export function deleteApi(auth: BasicAuthentication, apiId: string) {
+export function deleteApi(auth: BasicAuthentication, apiId: string, failOnStatusCode = false) {
   return cy.request({
     method: 'DELETE',
     url: `${Cypress.config().baseUrl}${Cypress.env('managementApi')}/apis/${apiId}`,
     auth,
-    failOnStatusCode: false,
+    failOnStatusCode,
+  });
+}
+
+export function deployApi(auth: BasicAuthentication, apiId: string, failOnStatusCode = false) {
+  return cy.request({
+    method: 'POST',
+    url: `${Cypress.config().baseUrl}${Cypress.env('managementApi')}/apis/${apiId}/deploy`,
+    auth,
+    failOnStatusCode,
+  });
+}
+
+export function startApi(auth: BasicAuthentication, apiId: string, failOnStatusCode = false) {
+  return cy.request({
+    method: 'POST',
+    url: `${Cypress.config().baseUrl}${Cypress.env('managementApi')}/apis/${apiId}?action=START`,
+    auth,
+    failOnStatusCode,
+  });
+}
+
+export function stopApi(auth: BasicAuthentication, apiId: string, failOnStatusCode = false) {
+  return cy.request({
+    method: 'POST',
+    url: `${Cypress.config().baseUrl}${Cypress.env('managementApi')}/apis/${apiId}?action=STOP`,
+    auth,
+    failOnStatusCode,
+  });
+}
+
+export function createPlan(auth: BasicAuthentication, apiId: string, body: Partial<NewPlanEntity>, failOnStatusCode = false) {
+  return cy.request({
+    method: 'POST',
+    url: `${Cypress.config().baseUrl}${Cypress.env('managementApi')}/apis/${apiId}/plans`,
+    auth,
+    body,
+    failOnStatusCode,
+  });
+}
+
+export function deletePlan(auth: BasicAuthentication, apiId: string, planId: string, failOnStatusCode = false) {
+  return cy.request({
+    method: 'DELETE',
+    url: `${Cypress.config().baseUrl}${Cypress.env('managementApi')}/apis/${apiId}/plans/${planId}`,
+    auth,
+    failOnStatusCode,
+  });
+}
+
+export function publishPlan(auth: BasicAuthentication, apiId: string, planId: string, failOnStatusCode = false) {
+  return cy.request({
+    method: 'POST',
+    url: `${Cypress.config().baseUrl}${Cypress.env('managementApi')}/apis/${apiId}/plans/${planId}/_publish`,
+    auth,
+    failOnStatusCode,
   });
 }

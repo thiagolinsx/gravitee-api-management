@@ -206,7 +206,7 @@ context('API - Publishing', () => {
         delete apiToPublish.created_at;
         delete apiToPublish.updated_at;
         delete apiToPublish.owner;
-        delete apiToPublish.contextPath;
+        delete apiToPublish.context_path;
 
         gio
           .management(API_PUBLISHER_USER)
