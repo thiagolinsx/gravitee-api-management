@@ -1,0 +1,83 @@
+{
+  "version": "2.1.2",
+  "description": "The automobile layout consists of a front-engine design, with transaxle-type transmissions mounted at the rear of the engine and four wheel drive",
+  "proxy": {
+    "virtual_hosts": [
+      {
+        "path": "/Sausages-6beaa07f-9531-4ec7-86db-033157345ce6-1640005862"
+      }
+    ],
+    "strip_context_path": false,
+    "preserve_host": false,
+    "groups": [
+      {
+        "name": "default-group",
+        "endpoints": [
+          {
+            "backup": false,
+            "name": "default",
+            "weight": 1,
+            "type": "http",
+            "target": "https://api.gravitee.io/echo"
+          }
+        ],
+        "load_balancing": {
+          "type": "ROUND_ROBIN"
+        },
+        "http": {
+          "connectTimeout": 5000,
+          "idleTimeout": 60000,
+          "keepAlive": true,
+          "readTimeout": 10000,
+          "pipelining": false,
+          "maxConcurrentConnections": 100,
+          "useCompression": true,
+          "followRedirects": false
+        }
+      }
+    ]
+  },
+  "paths": {
+    "/": [
+      {
+        "methods": [
+          "GET",
+          "POST",
+          "PUT",
+          "DELETE",
+          "HEAD",
+          "PATCH",
+          "OPTIONS",
+          "TRACE",
+          "CONNECT"
+        ],
+        "description": "Description of the Mock Gravitee Policy",
+        "enabled": true,
+        "mock": {
+          "headers": [],
+          "status": "200",
+          "content": "Te molam raboti primer"
+        }
+      }
+    ]
+  },
+  "visibility": "PRIVATE",
+  "name": "Practical Soft Shoes",
+  "services": {},
+  "properties": [],
+  "tags": [],
+  "picture_url": "http://localhost:8083/management/organizations/DEFAULT/environments/DEFAULT/apis/7bc81b2b-ff2e-4c19-881b-2bff2e2c1953/picture?hash=1640005863540",
+  "background_url": "http://localhost:8083/management/organizations/DEFAULT/environments/DEFAULT/apis/7bc81b2b-ff2e-4c19-881b-2bff2e2c1953/background?hash=1640005863540",
+  "resources": [],
+  "groups": [
+    "1858708e-9ef5-4d62-9870-8e9ef56d6255"
+  ],
+  "path_mappings": [
+    "/"
+  ],
+  "response_templates": {},
+  "lifecycle_state": "PUBLISHED",
+  "disable_membership_notifications": false,
+  "flow_mode": "DEFAULT",
+  "gravitee": "1.0.0"
+}

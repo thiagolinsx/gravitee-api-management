@@ -111,13 +111,13 @@ export interface NewPlanEntity {
   status: StatusState;
   api: string;
   characteristics: string[];
-  tags: string[];        
+  //tags: string[];        
   order: number;
   paths: object;
   flows: Flow[];
   excluded_groups: string[];
   comment_required: boolean;
   comment_message: string;
-  selection_rule: string;
-  general_conditions: string;
+  //selection_rule: string;
+  //general_conditions: string;
 }
