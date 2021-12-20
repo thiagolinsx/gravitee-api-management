@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import { Mock_policy } from '@model/policy';
-import { Api, ApiErrorCodes, ApiLifecycleState, PortalApi } from 'model/apis';
+import { Api, ApiLifecycleState } from 'model/apis';
 import { NewPlanEntity } from 'model/plan';
-import { User, BasicAuthentication } from 'model/users';
+import { BasicAuthentication } from 'model/users';
 
 export function createApi(auth: BasicAuthentication, body: Api, failOnStatusCode = false) {
   return cy.request({
@@ -28,16 +28,21 @@ export function createApi(auth: BasicAuthentication, body: Api, failOnStatusCode
   });
 }
 
-export function publishApi(auth: BasicAuthentication, apiId: string, api: Api, failOnStatusCode = false) {
-  // const apiToPublish = {
-  //   ...createdApi,
-  //   lifecycle_state: ApiLifecycleState.PUBLISHED,
-  // };
-  api.lifecycle_state = ApiLifecycleState.PUBLISHED;
+export function publishApi(auth: BasicAuthentication, createdApi: Api, failOnStatusCode = false) {
+  const apiToPublish = {
+    ...createdApi,
+    lifecycle_state: ApiLifecycleState.PUBLISHED,
+  };
+  delete apiToPublish.id;
+  delete apiToPublish.state;
+  delete apiToPublish.created_at;
+  delete apiToPublish.updated_at;
+  delete apiToPublish.owner;
+  delete apiToPublish.context_path;
   return cy.request({
     method: 'PUT',
-    url: `${Cypress.config().baseUrl}${Cypress.env('managementApi')}/apis/${apiId}`,
-    body: api,
+    url: `${Cypress.config().baseUrl}${Cypress.env('managementApi')}/apis/${createdApi.id}`,
+    body: apiToPublish,
     auth,
     failOnStatusCode,
   });
@@ -119,7 +124,6 @@ export function createMockpolicy1(auth: BasicAuthentication, apiId: string, body
 }
 
 export function createMockpolicy2(auth: BasicAuthentication, createdApi: Api, failOnStatusCode = false) {
-  //cy.fixture('mock_payload').as('mockbody')
   cy.fixture('mock_payload').then((mockbody) => {
     cy.intercept('GET', 'mock_payload', mockbody).as('mockbody')
   })
@@ -132,11 +136,5 @@ export function createMockpolicy2(auth: BasicAuthentication, createdApi: Api, fa
       headers: {
         'Content-Type': 'application/json;charset=UTF-8'
       }
-    }).then(function(response){
-      //console.log(response);
-      //console.log("dareeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-      return response});
-   
-  
-
+    }).then(function(response){return response});
   };

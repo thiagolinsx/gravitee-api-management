@@ -401,7 +401,12 @@ jobs:
                   working_directory: gravitee-apim-cypress
             - notify-on-failure
 
-    console-webui-install:
+    webui-install:
+        parameters:
+            apim-ui-project:
+                type: string
+                default: ""
+                description: the name of the UI project to build
         executor:
             name: node-lts
             class: small
@@ -410,26 +415,34 @@ jobs:
             - restore_cache:
                   name: Restore NPM cache
                   keys:
-                      - gravitee-apim-console-webui-cache-v1-{{ checksum "gravitee-apim-console-webui/package-lock.json" }}
+                      - << parameters.apim-ui-project >>-cache-v1-{{ checksum "<< parameters.apim-ui-project >>/package-lock.json" }}
             - run:
                   name: Install dependencies
                   command: npm install
-                  working_directory: gravitee-apim-console-webui
+                  working_directory: << parameters.apim-ui-project >>
             - notify-on-failure
             - save_cache:
                   name: Save NPM cache
-                  key: gravitee-apim-console-webui-cache-v1-{{ checksum "gravitee-apim-console-webui/package-lock.json" }}
+                  key: << parameters.apim-ui-project >>-cache-v1-{{ checksum "<< parameters.apim-ui-project >>/package-lock.json" }}
                   paths:
-                      - ./gravitee-apim-console-webui/node_modules
+                      - ./<< parameters.apim-ui-project >>/node_modules
             - persist_to_workspace:
                   root: .
                   paths:
-                      - gravitee-apim-console-webui/node_modules
+                      - << parameters.apim-ui-project >>/node_modules
 
-    console-webui-lint-test:
+    webui-lint-test:
+        parameters:
+            apim-ui-project:
+                type: string
+                default: ""
+                description: the name of the UI project to build
+            resource-class:
+                type: string
+                default: medium
         executor:
             name: node-lts
-            class: medium
+            class: << parameters.resource-class>>
         steps:
             - checkout
             - attach_workspace:
@@ -437,24 +450,29 @@ jobs:
             - run:
                   name: Check License
                   command: npm run lint:license
-                  working_directory: gravitee-apim-console-webui
+                  working_directory: << parameters.apim-ui-project >>
             - run:
                   name: Run Prettier and ESLint
                   command: npm run lint
-                  working_directory: gravitee-apim-console-webui
+                  working_directory: << parameters.apim-ui-project >>
             - run:
                   name: Run unit tests
-                  command: npm run test:ci
-                  working_directory: gravitee-apim-console-webui
+                  command: npm run test:coverage
+                  working_directory: << parameters.apim-ui-project >>
             - notify-on-failure
             - persist_to_workspace:
                   root: .
                   paths:
-                      - gravitee-apim-console-webui/coverage
+                      - << parameters.apim-ui-project >>/coverage
             - store_test_results:
-                  path: gravitee-apim-console-webui/coverage
+                  path: << parameters.apim-ui-project >>/coverage
 
-    console-webui-build:
+    webui-build:
+        parameters:
+            apim-ui-project:
+                type: string
+                default: ""
+                description: the name of the UI project to build
         executor:
             name: node-lts
             class: large
@@ -468,18 +486,60 @@ jobs:
                   environment:
                       NODE_OPTIONS: --max_old_space_size=4086
                       BACKEND_ENV: element-zero
-                  working_directory: gravitee-apim-console-webui
+                  working_directory: << parameters.apim-ui-project >>
             - run:
                   name: Zip dist folder
                   # TODO:
                   #  - Use gzip instead of zip
                   command: zip -r dist.zip dist
-                  working_directory: gravitee-apim-console-webui
+                  working_directory: << parameters.apim-ui-project >>
             - notify-on-failure
             - persist_to_workspace:
                   root: .
                   paths:
-                      - gravitee-apim-console-webui/dist
+                      - << parameters.apim-ui-project >>/dist
+
+    webui-publish-images-azure-registry:
+        parameters:
+            apim-ui-project:
+                type: string
+                default: ""
+                description: the name of the UI project to build
+            docker-image-name:
+                type: string
+                default: ""
+                description: the name of the docker image to create
+        docker:
+            - image: cimg/openjdk:11.0
+        resource_class: small
+        steps:
+            - checkout
+            - attach_workspace:
+                  at: .
+            - setup_remote_docker
+            - get-apim-tag
+            - run:
+                  name: Build & Publish Web UI Docker Image to Azure Registry
+                  command: |
+                      cp -fr docker/config .
+                      cp -fr docker/run.sh .
+
+                      export PUBLIC_IMAGE_TAG=graviteeio/<< parameters.docker-image-name >>:${TAG}
+                      export PRIVATE_IMAGE_TAG=graviteeio.azurecr.io/<< parameters.docker-image-name >>:${TAG}
+                      docker build -f docker/Dockerfile-dev -t ${PRIVATE_IMAGE_TAG} -t ${PUBLIC_IMAGE_TAG} .
+
+                      if [[ $CIRCLE_BRANCH =~ ^([0-9]+\.[0-9]+\.x|master)$ ]]
+                      then
+                        echo $DOCKERHUB_BOT_USER_TOKEN | docker login --username $DOCKERHUB_BOT_USER_NAME --password-stdin
+                        docker push ${PUBLIC_IMAGE_TAG}
+                        docker logout
+                      fi
+
+                      echo $AZURE_DOCKER_REGISTRY_PASSWORD | docker login --username $AZURE_DOCKER_REGISTRY_USERNAME --password-stdin graviteeio.azurecr.io
+                      docker push ${PRIVATE_IMAGE_TAG}
+                      docker logout graviteeio.azurecr.io
+                  working_directory: << parameters.apim-ui-project >>
+            - notify-on-failure
 
     console-webui-build-storybook:
         executor:
@@ -589,6 +649,7 @@ jobs:
                         echo "PR is not opened, stopping the job here."
                         exit 0
                       fi
+
                       export BRANCH_ID=$(echo "$CIRCLE_BRANCH" | sed -E 's/[~^]+//g' | sed -E 's/[^a-zA-Z0-9]+/-/g' | sed -E 's/^-+|-+$//g' | tr "[:upper:]" "[:lower:]" | cut -c -60)
                       export PR_BODY_UI_SECTION="
                       <!-- UI placeholder -->
@@ -603,39 +664,6 @@ jobs:
 
             - notify-on-failure
 
-    console-webui-publish-images-azure-registry:
-        docker:
-            - image: cimg/openjdk:11.0
-        resource_class: small
-        steps:
-            - checkout
-            - attach_workspace:
-                  at: .
-            - setup_remote_docker
-            - get-apim-tag
-            - run:
-                  name: Build & Publish Web UI Docker Image to Azure Registry
-                  command: |
-                      cp -fr docker/config .
-                      cp -fr docker/run.sh .
-
-                      export PUBLIC_IMAGE_TAG=graviteeio/apim-management-ui:${TAG}
-                      export PRIVATE_IMAGE_TAG=graviteeio.azurecr.io/apim-management-ui:${TAG}
-                      docker build -f docker/Dockerfile-dev -t ${PRIVATE_IMAGE_TAG} -t ${PUBLIC_IMAGE_TAG} .
-
-                      if [[ $CIRCLE_BRANCH =~ ^([0-9]+\.[0-9]+\.x|master)$ ]]
-                      then
-                        echo $DOCKERHUB_BOT_USER_TOKEN | docker login --username $DOCKERHUB_BOT_USER_NAME --password-stdin
-                        docker push ${PUBLIC_IMAGE_TAG}
-                        docker logout
-                      fi
-
-                      echo $AZURE_DOCKER_REGISTRY_PASSWORD | docker login --username $AZURE_DOCKER_REGISTRY_USERNAME --password-stdin graviteeio.azurecr.io
-                      docker push ${PRIVATE_IMAGE_TAG}
-                      docker logout graviteeio.azurecr.io
-                  working_directory: gravitee-apim-console-webui
-            - notify-on-failure
-
     purge-master-azure-registry:
         docker:
             - image: mcr.microsoft.com/azure-cli:latest
@@ -648,118 +676,6 @@ jobs:
                   command: |
                       az login --service-principal -u $AZURE_APPLICATION_ID --tenant $AZURE_TENANT -p $AZURE_APPLICATION_SECRET
                       az acr run --cmd "acr purge --filter 'apim-management-ui:master-.*' --untagged --ago 1d --keep 3" --registry graviteeio /dev/null
-            - notify-on-failure
-
-    portal-webui-install:
-        executor:
-            name: node-lts
-            class: small
-        steps:
-            - checkout
-            - restore_cache:
-                  name: Restore NPM cache
-                  keys:
-                      - gravitee-apim-portal-webui-cache-v1-{{ checksum "gravitee-apim-portal-webui/package-lock.json" }}
-            - run:
-                  name: Install dependencies
-                  command: npm install
-                  working_directory: gravitee-apim-portal-webui
-            - notify-on-failure
-            - save_cache:
-                  name: Save NPM cache
-                  key: gravitee-apim-portal-webui-cache-v1-{{ checksum "gravitee-apim-portal-webui/package-lock.json" }}
-                  paths:
-                      - ./gravitee-apim-portal-webui/node_modules
-            - persist_to_workspace:
-                  root: .
-                  paths:
-                      - gravitee-apim-portal-webui/node_modules
-
-    portal-webui-lint-test:
-        executor:
-            name: node-lts
-            class: large
-        steps:
-            - checkout
-            - attach_workspace:
-                  at: .
-            - run:
-                  name: Check License
-                  command: npm run lint:license
-                  working_directory: gravitee-apim-portal-webui
-            - run:
-                  name: Run Prettier and ESLint
-                  command: npm run lint
-                  working_directory: gravitee-apim-portal-webui
-            - run:
-                  name: Run unit tests
-                  command: npm run test:coverage
-                  working_directory: gravitee-apim-portal-webui
-            - notify-on-failure
-            - persist_to_workspace:
-                  root: .
-                  paths:
-                      - gravitee-apim-portal-webui/coverage
-            - store_test_results:
-                  path: gravitee-apim-portal-webui/coverage
-
-    portal-webui-build:
-        executor:
-            name: node-lts
-            class: large
-        steps:
-            - checkout
-            - attach_workspace:
-                  at: .
-            - run:
-                  name: Build
-                  command: npm run build:prod
-                  environment:
-                      NODE_OPTIONS: --max_old_space_size=4086
-                  working_directory: gravitee-apim-portal-webui
-            - run:
-                  name: Zip dist folder
-                  # TODO:
-                  #  - Use gzip instead of zip
-                  command: zip -r dist.zip dist
-                  working_directory: gravitee-apim-portal-webui
-            - notify-on-failure
-            - persist_to_workspace:
-                  root: .
-                  paths:
-                      - gravitee-apim-portal-webui/dist
-
-    portal-webui-publish-images-azure-registry:
-        docker:
-            - image: cimg/openjdk:11.0
-        resource_class: small
-        steps:
-            - checkout
-            - attach_workspace:
-                  at: .
-            - setup_remote_docker
-            - get-apim-tag
-            - run:
-                  name: Build & Publish Web UI Docker Image to Azure Registry
-                  command: |
-                      cp -fr docker/config .
-                      cp -fr docker/run.sh .
-
-                      export PUBLIC_IMAGE_TAG=graviteeio/apim-portal-ui:${TAG}
-                      export PRIVATE_IMAGE_TAG=graviteeio.azurecr.io/apim-portal-ui:${TAG}
-                      docker build -f docker/Dockerfile-dev -t ${PRIVATE_IMAGE_TAG} -t ${PUBLIC_IMAGE_TAG} .
-
-                      if [[ $CIRCLE_BRANCH =~ ^([0-9]+\.[0-9]+\.x|master)$ ]]
-                      then
-                        echo $DOCKERHUB_BOT_USER_TOKEN | docker login --username $DOCKERHUB_BOT_USER_NAME --password-stdin
-                        docker push ${PUBLIC_IMAGE_TAG}
-                        docker logout
-                      fi
-
-                      echo $AZURE_DOCKER_REGISTRY_PASSWORD | docker login --username $AZURE_DOCKER_REGISTRY_USERNAME --password-stdin graviteeio.azurecr.io
-                      docker push ${PRIVATE_IMAGE_TAG}
-                      docker logout graviteeio.azurecr.io
-                  working_directory: gravitee-apim-portal-webui
             - notify-on-failure
 
     deploy-on-azure-cluster:
@@ -898,7 +814,7 @@ jobs:
                       - release.settings.xml
     release:
         docker:
-            - image: cimg/openjdk:11.0.12
+            - image: cimg/openjdk:11.0.13
         resource_class: large
 
         environment:
@@ -1080,18 +996,32 @@ workflows:
                           only:
                               - master
                               - /^\d+\.\d+\.x$/
-            - console-webui-install:
+            - webui-install:
+                  name: Install APIM Console
+                  apim-ui-project: gravitee-apim-console-webui
                   requires:
                       - load-snapshot-configuration
-            - console-webui-lint-test:
+            - webui-lint-test:
+                  name: Lint & test APIM Console
+                  apim-ui-project: gravitee-apim-console-webui
                   requires:
-                      - console-webui-install
-            - console-webui-build:
-                  requires:
-                      - console-webui-install
+                      - Install APIM Console
             - console-webui-build-storybook:
                   requires:
-                      - console-webui-install
+                      - Install APIM Console
+            - console-webui-chromatic-deployment:
+                  context: cicd-orchestrator
+                  requires:
+                      - console-webui-build-storybook
+                  pre-steps:
+                      - secrethub/env-export:
+                            secret-path: graviteeio/cicd/graviteebot/github_personal_access_token
+                            var-name: GITHUB_TOKEN
+            - webui-build:
+                  name: Build APIM Console
+                  apim-ui-project: gravitee-apim-console-webui
+                  requires:
+                      - Install APIM Console
             - console-webui-deploy-on-azure-storage:
                   context: cicd-orchestrator
                   pre-steps:
@@ -1105,7 +1035,7 @@ workflows:
                             secret-path: graviteeio/cicd/azure/application-secret
                             var-name: AZURE_APPLICATION_SECRET
                   requires:
-                      - console-webui-build
+                      - Build APIM Console
             - console-webui-comment-pr-after-deployment:
                   context: cicd-orchestrator
                   pre-steps:
@@ -1114,15 +1044,10 @@ workflows:
                             var-name: GITHUB_TOKEN
                   requires:
                       - console-webui-deploy-on-azure-storage
-            - console-webui-chromatic-deployment:
-                  context: cicd-orchestrator
-                  requires:
-                      - console-webui-build-storybook
-                  pre-steps:
-                      - secrethub/env-export:
-                            secret-path: graviteeio/cicd/graviteebot/github_personal_access_token
-                            var-name: GITHUB_TOKEN
-            - console-webui-publish-images-azure-registry:
+            - webui-publish-images-azure-registry:
+                  name: Build and publish APIM Console docker image
+                  apim-ui-project: gravitee-apim-console-webui
+                  docker-image-name: apim-management-ui
                   context: cicd-orchestrator
                   pre-steps:
                       - secrethub/env-export:
@@ -1138,19 +1063,24 @@ workflows:
                             secret-path: graviteeio/cicd/graviteebot/infra/dockerhub-user-token
                             var-name: DOCKERHUB_BOT_USER_TOKEN
                   requires:
-                      - console-webui-build
+                      - Build APIM Console
                       - compute-apim-tag
                   filters:
                       branches:
                           only:
                               - master
                               - /^\d+\.\d+\.x$/
-            - portal-webui-install:
+            - webui-install:
+                  name: Install APIM Portal
+                  apim-ui-project: gravitee-apim-portal-webui
                   requires:
                       - load-snapshot-configuration
-            - portal-webui-lint-test:
+            - webui-lint-test:
+                  name: Lint & test APIM Portal
+                  apim-ui-project: gravitee-apim-portal-webui
+                  resource-class: large
                   requires:
-                      - portal-webui-install
+                      - Install APIM Portal
             - sonarcloud-analysis:
                   name: Sonar - << matrix.working_directory >>
                   matrix:
@@ -1160,12 +1090,17 @@ workflows:
                               - gravitee-apim-portal-webui
                   context: cicd-orchestrator
                   requires:
-                      - console-webui-lint-test
-                      - portal-webui-lint-test
-            - portal-webui-build:
+                      - Lint & test APIM Console
+                      - Lint & test APIM Portal
+            - webui-build:
+                  name: Build APIM Portal
+                  apim-ui-project: gravitee-apim-portal-webui
                   requires:
-                      - portal-webui-install
-            - portal-webui-publish-images-azure-registry:
+                      - Install APIM Portal
+            - webui-publish-images-azure-registry:
+                  name: Build and publish APIM Portal docker image
+                  apim-ui-project: gravitee-apim-portal-webui
+                  docker-image-name: apim-portal-ui
                   context: cicd-orchestrator
                   pre-steps:
                       - secrethub/env-export:
@@ -1181,7 +1116,7 @@ workflows:
                             secret-path: graviteeio/cicd/graviteebot/infra/dockerhub-user-token
                             var-name: DOCKERHUB_BOT_USER_TOKEN
                   requires:
-                      - portal-webui-build
+                      - Build APIM Portal
                       - compute-apim-tag
                   filters:
                       branches:
@@ -1202,8 +1137,8 @@ workflows:
                             var-name: AZURE_APPLICATION_SECRET
                   requires:
                       - publish-images-azure-registry
-                      - console-webui-publish-images-azure-registry
-                      - portal-webui-publish-images-azure-registry
+                      - Build and publish APIM Console docker image
+                      - Build and publish APIM Portal docker image
                   filters:
                       branches:
                           only:

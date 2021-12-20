@@ -22,7 +22,7 @@ import { ErrorAssertions } from 'assertions/error.assertion';
 import { gio } from 'commands/gravitee.commands';
 import { PlanFakers } from 'fixtures/fakers/plans';
 import { SecurityType } from '@model/plan';
-import { createMockpolicy1, createMockpolicy2, createPlan, publishPlan } from 'commands/management/api-management-commands';
+import { createMockpolicy1, createMockpolicy2, createPlan, deleteApi, publishPlan } from 'commands/management/api-management-commands';
 import { fakePolicy } from 'fixtures/fakers/policy';
 
 context('API - Publishing', () => {
@@ -120,16 +120,20 @@ context('API - Publishing', () => {
           expect(response.body.status).to.equal('PUBLISHED');
           cy.wrap(response.body.id).as('planId');
       })
-      });
+    });
 
-      it('should create Mock policy', function () {
+    it('should create Mock policy', function () {
         //const fakedPolicy = fakePolicy.plan({id: createdApi.id});
         createMockpolicy2(ADMIN_USER, createdApi).should(function (response) {
             expect(response.status).to.equal(200);
             //expect(response.body.status).to.equal('PUBLISHED');
             //cy.wrap(response.body.id).as('planId');
         })
-        });
+    });
+
+    it('should delete an API as admin user', function () {
+      deleteApi(ADMIN_USER, createdApi.id).its('status').should('equal', 204);
+    });
 
 
 

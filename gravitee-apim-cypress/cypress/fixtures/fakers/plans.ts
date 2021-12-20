@@ -22,9 +22,6 @@ export class PlanFakers {
       ...attributes,
       name: faker.commerce.productName(),
       description: faker.commerce.productDescription(),
-    //   validation: 'AUTO',
-    //   paths: {"/": []},
-    //   security: 'KEY_LESS'
     };
   }
 }
