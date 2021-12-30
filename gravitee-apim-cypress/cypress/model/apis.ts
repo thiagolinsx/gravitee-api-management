@@ -28,6 +28,7 @@ export interface Api {
   owner: string;
   workflow_state: string;
   labels?: string[];
+  status: string;
 }
 
 export interface ApiDefinition {
@@ -79,6 +80,7 @@ export enum ApiVisibility {
 export enum ApiLifecycleState {
   CREATED = 'CREATED',
   PUBLISHED = 'PUBLISHED',
+  UNPUBLISHED = 'UNPUBLISHED'
 }
 
 export enum ApiWorkflowState {

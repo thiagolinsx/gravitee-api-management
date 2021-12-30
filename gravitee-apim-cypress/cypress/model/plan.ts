@@ -123,4 +123,5 @@ export interface NewPlanEntity {
   comment_message: string;
   selection_rule: string;
   general_conditions: string;
+  published_at: number;
 }

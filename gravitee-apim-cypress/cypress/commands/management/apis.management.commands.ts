@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 import { ErrorableManagement, RequestInfo } from 'model/technical';
-import { Api, ApiDefinition, ApiMember } from 'model/apis';
+import { Api, ApiDefinition, ApiLifecycleState, ApiMember } from 'model/apis';
+import { NewPlanEntity} from 'model/plan';
 import Chainable = Cypress.Chainable;
 import Response = Cypress.Response;
 import { HttpConnector } from 'model/technical.http';
@@ -59,4 +60,40 @@ export class ApiManagementCommands extends HttpConnector {
   addMemberToApi<T extends ErrorableManagement<ApiMember> = ApiMember>(apiId: string, apiMember: ApiMember): Chainable<Response<T>> {
     return this.httpClient.post(`/apis/${apiId}/members`, apiMember);
   }
+
+  createPlanX<T extends ErrorableManagement<NewPlanEntity> = NewPlanEntity>(apiId: string, planIdApi:string, api: NewPlanEntity): Chainable<Response<T>> {
+    return this.httpClient.post(`/apis/${apiId}/plans/${planIdApi}`, api);
+  }
+
+
+
+  
+
+  
+
+  updateCreate<T extends ErrorableManagement<Api> = Api>(apiId: string, api: Api): Chainable<Response<T>> {
+    api.lifecycle_state = ApiLifecycleState.UNPUBLISHED;
+    return this.httpClient.put(`/apis/${apiId}`, api);
+  }
+  getPlanId<T extends ErrorableManagement<Api> = Api>(apiId: string): Chainable<Response<T>> {
+    return this.httpClient.get(`/apis/${apiId}/plans?status=staging,published,closed,deprecated`);
+  }
+  
+
+  
+
+  startWithBody<T extends ErrorableManagement<Api> = Api>(apiId: string, api: Api): Chainable<Response<T>> {
+    return this.httpClient.post(`/apis/${apiId}?action=START`, api);
+  }
+
+  
+
+  stopPlanX<T extends ErrorableManagement<Api> = Api>(apiId: string, planIdApi:string, api: Api): Chainable<Response<T>> {
+    return this.httpClient.post(`/apis/${apiId}/plans/${planIdApi}/_close`, api);
+  }
+
+
+  
+
+
 }

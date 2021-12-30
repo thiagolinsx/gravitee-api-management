@@ -130,10 +130,21 @@ context('API - Publishing', () => {
             //cy.wrap(response.body.id).as('planId');
         })
     });
+    
+    it('Publish Mock policy and available to Gratewey', function () {
+      //const fakedPolicy = fakePolicy.plan({id: createdApi.id});
+      createMockpolicy2(ADMIN_USER, createdApi).should(function (response) {
+          expect(response.status).to.equal(200);
+          //expect(response.body.status).to.equal('PUBLISHED');
+          //cy.wrap(response.body.id).as('planId');
+      })
+  });
 
-    it('should delete an API as admin user', function () {
-      deleteApi(ADMIN_USER, createdApi.id).its('status').should('equal', 204);
-    });
+
+
+    // it('should delete an API as admin user', function () {
+    //   deleteApi(ADMIN_USER, createdApi.id).its('status').should('equal', 204);
+    // });
 
 
 
