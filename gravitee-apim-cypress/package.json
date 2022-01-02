@@ -1,6 +1,6 @@
 {
     "name": "gravitee-apim-cypress",
-    "version": "3.13.0-SNAPSHOT",
+    "version": "3.14.0-SNAPSHOT",
     "private": true,
     "description": "Gravitee.io APIM - Cypress",
     "scripts": {
@@ -24,7 +24,7 @@
         "@types/faker": "5.5.9",
         "@types/node": "14.17.34",
         "ansi-regex": "6.0.1",
-        "cypress": "8.7.0",
+        "cypress": "^9.2.0",
         "cypress-terminal-report": "3.4.0",
         "har-validator": "5.1.5",
         "license-check-and-add": "4.0.3",
