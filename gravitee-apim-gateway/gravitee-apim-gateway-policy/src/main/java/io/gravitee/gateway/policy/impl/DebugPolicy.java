@@ -54,9 +54,29 @@ public class DebugPolicy implements Policy {
 
         before(context);
         final ReadWriteStream<Buffer> stream = policy.stream(chain, context);
+
+        if (stream == null) {
+            return null;
+        }
+
+        //Discuss with archi
+//        context.push(this) (cas du execute)
+//        new DebugReadWriteStream((content) -> {  }) // se chargera de pusher au moment du bodyHandler
+//        push(Policy) {
+//            listOrder.add(policy)
+//            streamMap.put(policy, content)
+//            executionMap.
+//        }
+
+        var otherStream = new DebugReadWriteStream(context, stream, policy);
+        otherStream.endHandler(result -> {
+            final String content = otherStream.getContent();
+            LOGGER.info("Body content: {}", content);
+        });
+
         after(context);
 
-        return stream;
+        return otherStream;
     }
 
     @Override
@@ -80,6 +100,8 @@ public class DebugPolicy implements Policy {
         if (streamType.equals(StreamType.ON_REQUEST)) {
             context.request().bodyHandler(b -> LOGGER.info("Body: {}", b.toString()));
         } else {
+
+
             TransformableRequestStreamBuilder.on(context.request()).transform(b -> {
                 LOGGER.info("Body:");
                 LOGGER.info(b.toString());
