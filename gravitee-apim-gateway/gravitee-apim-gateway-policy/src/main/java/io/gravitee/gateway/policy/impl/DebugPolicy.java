@@ -84,7 +84,10 @@ public class DebugPolicy implements Policy {
                 LOGGER.info("Body:");
                 LOGGER.info(b.toString());
                 return b;
-            }).build();
+            }).build().bodyHandler(b -> {
+                LOGGER.info("Body:");
+                LOGGER.info(b.toString());
+            });
         }
     }
 
