@@ -65,6 +65,8 @@ import io.gravitee.resource.api.ResourceManager;
 import io.vertx.core.Vertx;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.function.Function;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,23 +82,43 @@ public class ApiContextHandlerFactory implements ReactorHandlerFactory<Api> {
 
     private final Logger logger = LoggerFactory.getLogger(ApiContextHandlerFactory.class);
 
-    @Autowired
+//    @Autowired
     private ApplicationContext applicationContext;
 
-    @Value("${reporters.logging.max_size:-1}")
+//    @Value("${reporters.logging.max_size:-1}")
     private int maxSizeLogMessage;
 
-    @Value("${reporters.logging.excluded_response_types:#{null}}")
+//    @Value("${reporters.logging.excluded_response_types:#{null}}")
     private String excludedResponseTypes;
 
-    @Value("${handlers.request.headers.x-forwarded-prefix:false}")
+//    @Value("${handlers.request.headers.x-forwarded-prefix:false}")
     private boolean overrideXForwardedPrefix;
 
-    @Value("${classloader.legacy.enabled:true}")
+//    @Value("${classloader.legacy.enabled:true}")
     private boolean classLoaderLegacyMode;
 
-    @Autowired
+//    @Autowired
     private Node node;
+    private Function<CompositeComponentProvider, ExecutionContextFactory> executionContextFactoryCreator;
+    private Function<PolicyManager, PolicyChainFactory> policyChainFactoryCreator;
+
+    public ApiContextHandlerFactory(ApplicationContext applicationContext,
+                                    int maxSizeLogMessage,
+                                    String excludedResponseTypes,
+                                    boolean overrideXForwardedPrefix,
+                                    boolean classLoaderLegacyMode,
+                                    Node node,
+                                    Function<CompositeComponentProvider, ExecutionContextFactory> executionContextFactoryCreator,
+                                    Function<PolicyManager, PolicyChainFactory> policyChainFactoryCreator) {
+        this.applicationContext = applicationContext;
+        this.maxSizeLogMessage = maxSizeLogMessage;
+        this.excludedResponseTypes = excludedResponseTypes;
+        this.overrideXForwardedPrefix = overrideXForwardedPrefix;
+        this.classLoaderLegacyMode = classLoaderLegacyMode;
+        this.node = node;
+        this.executionContextFactoryCreator = executionContextFactoryCreator;
+        this.policyChainFactoryCreator = policyChainFactoryCreator;
+    }
 
     @Override
     public ReactorHandler create(Api api) {
@@ -139,7 +161,7 @@ public class ApiContextHandlerFactory implements ReactorHandlerFactory<Api> {
                     apiComponentProvider
                 );
 
-                final PolicyChainFactory policyChainFactory = policyChainFactory(policyManager);
+                final PolicyChainFactory policyChainFactory = policyChainFactoryCreator.apply(policyManager);
                 final RequestProcessorChainFactory requestProcessorChainFactory = requestProcessorChainFactory(
                     api,
                     policyChainFactory,
@@ -177,7 +199,7 @@ public class ApiContextHandlerFactory implements ReactorHandlerFactory<Api> {
                 handler.setGroupLifecycleManager(groupLifecycleManager);
                 handler.setResourceLifecycleManager(resourceLifecycleManager);
 
-                ExecutionContextFactory executionContextFactory = executionContextFactory(apiComponentProvider);
+                ExecutionContextFactory executionContextFactory = executionContextFactoryCreator.apply(apiComponentProvider);
 
                 executionContextFactory.addTemplateVariableProvider(new ApiTemplateVariableProvider(api));
                 executionContextFactory.addTemplateVariableProvider(referenceRegister);
@@ -199,9 +221,9 @@ public class ApiContextHandlerFactory implements ReactorHandlerFactory<Api> {
         return null;
     }
 
-    public PolicyChainFactory policyChainFactory(PolicyManager policyManager) {
-        return new PolicyChainFactory(policyManager);
-    }
+//    public PolicyChainFactory policyChainFactory(PolicyManager policyManager) {
+//        return new PolicyChainFactory(policyManager);
+//    }
 
     public PolicyManager policyManager(
         Api api,
@@ -291,9 +313,9 @@ public class ApiContextHandlerFactory implements ReactorHandlerFactory<Api> {
         return new DefaultAuthenticationHandlerSelector(authenticationHandlerManager);
     }
 
-    public ExecutionContextFactory executionContextFactory(ComponentProvider componentProvider) {
-        return new ExecutionContextFactory(componentProvider);
-    }
+//    public ExecutionContextFactory executionContextFactory(ComponentProvider componentProvider) {
+//        return new ExecutionContextFactory(componentProvider);
+//    }
 
     public InvokerFactory invokerFactory(Api api, Vertx vertx, EndpointResolver endpointResolver) {
         return new InvokerFactory(api, vertx, endpointResolver);

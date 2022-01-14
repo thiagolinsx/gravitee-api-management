@@ -16,21 +16,55 @@
 package io.gravitee.gateway.debug;
 
 import io.gravitee.gateway.debug.vertx.VertxDebugService;
+import io.gravitee.gateway.flow.policy.PolicyChainFactory;
+import io.gravitee.gateway.handlers.api.ApiContextHandlerFactory;
+import io.gravitee.gateway.handlers.api.definition.Api;
 import io.gravitee.gateway.reactor.handler.EntrypointResolver;
+import io.gravitee.gateway.reactor.handler.ReactorHandlerFactory;
 import io.gravitee.gateway.reactor.handler.ReactorHandlerFactoryManager;
 import io.gravitee.gateway.reactor.handler.ReactorHandlerRegistry;
+import io.gravitee.gateway.reactor.handler.context.ExecutionContextFactory;
 import io.gravitee.gateway.reactor.handler.impl.DefaultEntrypointResolver;
 import io.gravitee.gateway.reactor.handler.impl.DefaultReactorHandlerRegistry;
+import io.gravitee.node.api.Node;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DebugConfiguration {
 
+    private ApplicationContext applicationContext;
+
+    private Node node;
+
+    public DebugConfiguration(ApplicationContext applicationContext, Node node) {
+        this.applicationContext = applicationContext;
+        this.node = node;
+    }
+
     @Bean
     public VertxDebugService vertxDebugService() {
         return new VertxDebugService();
+    }
+
+    @Bean
+    @Qualifier("debugReactorHandlerFactory")
+    public ReactorHandlerFactory<Api> reactorHandlerFactory(
+            @Value("${reporters.logging.max_size:-1}") int maxSizeLogMessage,
+            @Value("${reporters.logging.excluded_response_types:#{null}}") String excludedResponseTypes,
+            @Value("${handlers.request.headers.x-forwarded-prefix:false}") boolean overrideXForwardedPrefix,
+            @Value("${classloader.legacy.enabled:true}") boolean classLoaderLegacyMode) {
+        return new ApiContextHandlerFactory(applicationContext.getParent(), maxSizeLogMessage, excludedResponseTypes, overrideXForwardedPrefix, classLoaderLegacyMode, node, ExecutionContextFactory::new, PolicyChainFactory::new);
+    }
+
+    @Bean
+    @Qualifier("debugReactorHandlerFactoryManager")
+    public ReactorHandlerFactoryManager reactorHandlerFactoryManager(@Qualifier("debugReactorHandlerFactory") ReactorHandlerFactory reactorHandlerFactory) {
+        return new ReactorHandlerFactoryManager(reactorHandlerFactory);
     }
 
     @Bean

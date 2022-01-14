@@ -18,8 +18,10 @@ package io.gravitee.gateway.handlers.api;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
+import io.gravitee.gateway.flow.policy.PolicyChainFactory;
 import io.gravitee.gateway.handlers.api.definition.Api;
 import io.gravitee.gateway.reactor.handler.ReactorHandler;
+import io.gravitee.gateway.reactor.handler.context.ExecutionContextFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -39,7 +41,7 @@ public class ApiContextHandlerFactoryTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        apiContextHandlerFactory = new ApiContextHandlerFactory();
+        apiContextHandlerFactory = new ApiContextHandlerFactory(null, 10, null, true, true, null, ExecutionContextFactory::new, PolicyChainFactory::new);
     }
 
     @Test

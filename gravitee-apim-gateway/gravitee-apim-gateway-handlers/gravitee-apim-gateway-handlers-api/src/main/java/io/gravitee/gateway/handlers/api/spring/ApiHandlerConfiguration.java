@@ -19,6 +19,9 @@ import io.gravitee.common.util.DataEncryptor;
 import io.gravitee.gateway.core.classloader.DefaultClassLoader;
 import io.gravitee.gateway.core.component.ComponentProvider;
 import io.gravitee.gateway.core.component.spring.SpringComponentProvider;
+import io.gravitee.gateway.flow.policy.PolicyChainFactory;
+import io.gravitee.gateway.handlers.api.ApiContextHandlerFactory;
+import io.gravitee.gateway.handlers.api.definition.Api;
 import io.gravitee.gateway.handlers.api.manager.ApiManager;
 import io.gravitee.gateway.handlers.api.manager.endpoint.ApiManagementEndpoint;
 import io.gravitee.gateway.handlers.api.manager.endpoint.ApisManagementEndpoint;
@@ -27,8 +30,15 @@ import io.gravitee.gateway.handlers.api.manager.impl.ApiManagerImpl;
 import io.gravitee.gateway.policy.PolicyPluginFactory;
 import io.gravitee.gateway.policy.impl.PolicyFactoryCreator;
 import io.gravitee.gateway.policy.impl.PolicyPluginFactoryImpl;
+import io.gravitee.gateway.reactor.Reactable;
+import io.gravitee.gateway.reactor.handler.ReactorHandlerFactory;
+import io.gravitee.gateway.reactor.handler.ReactorHandlerFactoryManager;
 import io.gravitee.gateway.reactor.handler.context.ApiTemplateVariableProviderFactory;
+import io.gravitee.gateway.reactor.handler.context.ExecutionContextFactory;
+import io.gravitee.node.api.Node;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,6 +56,9 @@ public class ApiHandlerConfiguration {
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Autowired
+    private Node node;
 
     @Bean
     public ApiManager apiManager() {
@@ -95,5 +108,14 @@ public class ApiHandlerConfiguration {
     @Bean
     public ApiTemplateVariableProviderFactory apiTemplateVariableProviderFactory() {
         return new ApiTemplateVariableProviderFactory();
+    }
+
+    @Bean
+    public ReactorHandlerFactory<Api> reactorHandlerFactory(
+            @Value("${reporters.logging.max_size:-1}") int maxSizeLogMessage,
+            @Value("${reporters.logging.excluded_response_types:#{null}}") String excludedResponseTypes,
+            @Value("${handlers.request.headers.x-forwarded-prefix:false}") boolean overrideXForwardedPrefix,
+            @Value("${classloader.legacy.enabled:true}") boolean classLoaderLegacyMode) {
+        return new ApiContextHandlerFactory(applicationContext, maxSizeLogMessage, excludedResponseTypes, overrideXForwardedPrefix, classLoaderLegacyMode, node, ExecutionContextFactory::new, PolicyChainFactory::new);
     }
 }
