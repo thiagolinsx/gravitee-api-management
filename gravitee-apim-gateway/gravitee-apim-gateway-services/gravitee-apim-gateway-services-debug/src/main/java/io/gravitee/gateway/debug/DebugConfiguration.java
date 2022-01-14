@@ -15,6 +15,7 @@
  */
 package io.gravitee.gateway.debug;
 
+import io.gravitee.gateway.debug.flow.DebugPolicyChainFactory;
 import io.gravitee.gateway.debug.vertx.VertxDebugService;
 import io.gravitee.gateway.flow.policy.PolicyChainFactory;
 import io.gravitee.gateway.handlers.api.ApiContextHandlerFactory;
@@ -58,7 +59,7 @@ public class DebugConfiguration {
             @Value("${reporters.logging.excluded_response_types:#{null}}") String excludedResponseTypes,
             @Value("${handlers.request.headers.x-forwarded-prefix:false}") boolean overrideXForwardedPrefix,
             @Value("${classloader.legacy.enabled:true}") boolean classLoaderLegacyMode) {
-        return new ApiContextHandlerFactory(applicationContext.getParent(), maxSizeLogMessage, excludedResponseTypes, overrideXForwardedPrefix, classLoaderLegacyMode, node, ExecutionContextFactory::new, PolicyChainFactory::new);
+        return new ApiContextHandlerFactory(applicationContext.getParent(), maxSizeLogMessage, excludedResponseTypes, overrideXForwardedPrefix, classLoaderLegacyMode, node, ExecutionContextFactory::new, DebugPolicyChainFactory::new);
     }
 
     @Bean

@@ -1,4 +1,4 @@
-package io.gravitee.gateway.policy.impl;
+package io.gravitee.gateway.debug.policy.impl;
 
 import io.gravitee.common.http.HttpHeaders;
 import io.gravitee.gateway.api.ExecutionContext;
@@ -8,12 +8,14 @@ import io.gravitee.gateway.api.stream.ReadWriteStream;
 import io.gravitee.gateway.policy.Policy;
 import io.gravitee.gateway.policy.PolicyException;
 import io.gravitee.gateway.policy.StreamType;
+import io.gravitee.gateway.policy.impl.DebugReadWriteStream;
 import io.gravitee.policy.api.PolicyChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 /**
  * @author Yann TAVERNIER (yann.tavernier at graviteesource.com)
@@ -69,10 +71,10 @@ public class DebugPolicy implements Policy {
 //        }
 
         var otherStream = new DebugReadWriteStream(context, stream, policy);
-        otherStream.endHandler(result -> {
-            final String content = otherStream.getContent();
-            LOGGER.info("Body content: {}", content);
-        });
+//        otherStream.endHandler(result -> {
+//            final String content = otherStream.getContent();
+//            LOGGER.info("Body content: {}", content);
+//        });
 
         after(context);
 
@@ -97,20 +99,20 @@ public class DebugPolicy implements Policy {
         LOGGER.info("Starting at: {}", begin);
         printHeaders(streamType.equals(StreamType.ON_REQUEST) ? context.request().headers() : context.response().headers());
 
-        if (streamType.equals(StreamType.ON_REQUEST)) {
-            context.request().bodyHandler(b -> LOGGER.info("Body: {}", b.toString()));
-        } else {
-
-
-            TransformableRequestStreamBuilder.on(context.request()).transform(b -> {
-                LOGGER.info("Body:");
-                LOGGER.info(b.toString());
-                return b;
-            }).build().bodyHandler(b -> {
-                LOGGER.info("Body:");
-                LOGGER.info(b.toString());
-            });
-        }
+//        if (streamType.equals(StreamType.ON_REQUEST)) {
+//            context.request().bodyHandler(b -> LOGGER.info("Body: {}", b.toString()));
+//        } else {
+//
+//
+//            TransformableRequestStreamBuilder.on(context.request()).transform(b -> {
+//                LOGGER.info("Body:");
+//                LOGGER.info(b.toString());
+//                return b;
+//            }).build().bodyHandler(b -> {
+//                LOGGER.info("Body:");
+//                LOGGER.info(b.toString());
+//            });
+//        }
     }
 
     private void after(ExecutionContext context) {
