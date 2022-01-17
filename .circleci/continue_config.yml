@@ -743,6 +743,16 @@ jobs:
         executor:
             name: azure-cli
             resource_class: small
+        parameters:
+            deploy-portal:
+                type: boolean
+                default: false
+            deploy-console:
+                type: boolean
+                default: false
+            deploy-apim-and-gw:
+                type: boolean
+                default: false
         steps:
             - attach_workspace:
                   at: .
@@ -772,11 +782,18 @@ jobs:
                       az login --service-principal -u $AZURE_APPLICATION_ID --tenant $AZURE_TENANT -p $AZURE_APPLICATION_SECRET
                       az aks get-credentials --resource-group apim-hprod --name apim-hprod
 
-                      kubectl rollout restart deployment/${K8S_NAME}-apim3-api -n ${K8S_NAMESPACE}
+                      <<# parameters.deploy-portal >>
                       kubectl rollout restart deployment/${K8S_NAME}-apim3-portal -n ${K8S_NAMESPACE}
-                      kubectl rollout restart deployment/${K8S_NAME}-apim3-ui -n ${K8S_NAMESPACE}
-                      kubectl rollout restart deployment/${K8S_NAME}-apim3-gateway -n ${K8S_NAMESPACE}
+                      <</ parameters.deploy-portal>>
 
+                      <<# parameters.deploy-console >>
+                      kubectl rollout restart deployment/${K8S_NAME}-apim3-ui -n ${K8S_NAMESPACE}
+                      <</ parameters.deploy-console>>
+
+                      <<# parameters.deploy-apim-and-gw >>
+                      kubectl rollout restart deployment/${K8S_NAME}-apim3-api -n ${K8S_NAMESPACE}
+                      kubectl rollout restart deployment/${K8S_NAME}-apim3-gateway -n ${K8S_NAMESPACE}
+                      <</ parameters.deploy-apim-and-gw>>
             - notify-on-failure
 
     ## Release Jobs
@@ -1155,10 +1172,11 @@ jobs:
             - notify-on-failure
 
 workflows:
-    pull_requests:
+    build_back:
         when:
             and:
                 - equal: [pull_requests, << pipeline.parameters.gio_action >>]
+                - equal: [true, << pipeline.parameters.build_maven >>]
         jobs:
             - setup:
                   context: cicd-orchestrator
@@ -1198,7 +1216,6 @@ workflows:
                           only:
                               - master
                               - /^\d+\.\d+\.x$/
-                              - fix-nexus-pb
                   requires:
                       - test
             - publish-on-nexus:
@@ -1207,7 +1224,6 @@ workflows:
                           only:
                               - master
                               - /^\d+\.\d+\.x$/
-                              - fix-nexus-pb
                   requires:
                       - test
             - publish-images-azure-registry:
@@ -1219,11 +1235,43 @@ workflows:
                           only:
                               - master
                               - /^\d+\.\d+\.x$/
+            - deploy-on-azure-cluster:
+                  context: cicd-orchestrator
+                  requires:
+                      - publish-images-azure-registry
+                  filters:
+                      branches:
+                          only:
+                              - master
+                              - /^\d+\.\d+\.x$/
+                  deploy-apim-and-gw: true
+            # To be modified when testing strategy will be defined
+            - cypress-install:
+                  requires:
+                      - build
+            - cypress-lint-test:
+                  requires:
+                      - cypress-install
+
+    build_console:
+        when:
+            and:
+                - equal: [pull_requests, << pipeline.parameters.gio_action >>]
+                - equal: [true, << pipeline.parameters.build_console >>]
+        jobs:
+            - setup:
+                  context: cicd-orchestrator
             - webui-lint-test:
                   name: Lint & Test APIM Console
                   apim-ui-project: gravitee-apim-console-webui
                   requires:
                       - setup
+            - sonarcloud-analysis:
+                  name: Sonar - APIM Console
+                  context: cicd-orchestrator
+                  requires:
+                      - Lint & Test APIM Console
+                  working_directory: gravitee-apim-console-webui
             - console-webui-build-storybook:
                   name: Build Console Storybook
                   requires:
@@ -1258,6 +1306,25 @@ workflows:
                           only:
                               - master
                               - /^\d+\.\d+\.x$/
+            - deploy-on-azure-cluster:
+                  context: cicd-orchestrator
+                  requires:
+                      - Build and publish APIM Console docker image
+                  filters:
+                      branches:
+                          only:
+                              - master
+                              - /^\d+\.\d+\.x$/
+                  deploy-console: true
+
+    build_portal:
+        when:
+            and:
+                - equal: [pull_requests, << pipeline.parameters.gio_action >>]
+                - equal: [true, << pipeline.parameters.build_portal >>]
+        jobs:
+            - setup:
+                  context: cicd-orchestrator
             - webui-lint-test:
                   name: Lint & Test APIM Portal
                   apim-ui-project: gravitee-apim-portal-webui
@@ -1265,16 +1332,11 @@ workflows:
                   requires:
                       - setup
             - sonarcloud-analysis:
-                  name: Sonar - << matrix.working_directory >>
-                  matrix:
-                      parameters:
-                          working_directory:
-                              - gravitee-apim-console-webui
-                              - gravitee-apim-portal-webui
+                  name: Sonar - APIM Portal
                   context: cicd-orchestrator
                   requires:
-                      - Lint & Test APIM Console
                       - Lint & Test APIM Portal
+                  working_directory: gravitee-apim-portal-webui
             - webui-build:
                   name: Build APIM Portal
                   apim-ui-project: gravitee-apim-portal-webui
@@ -1296,21 +1358,13 @@ workflows:
             - deploy-on-azure-cluster:
                   context: cicd-orchestrator
                   requires:
-                      - publish-images-azure-registry
-                      - Build and publish APIM Console docker image
                       - Build and publish APIM Portal docker image
                   filters:
                       branches:
                           only:
                               - master
                               - /^\d+\.\d+\.x$/
-                  # To be modified when testing strategy will be defined
-            - cypress-install:
-                  requires:
-                      - build
-            - cypress-lint-test:
-                  requires:
-                      - cypress-install
+                  deploy-portal: true
 
     build_docker_images:
         when:
