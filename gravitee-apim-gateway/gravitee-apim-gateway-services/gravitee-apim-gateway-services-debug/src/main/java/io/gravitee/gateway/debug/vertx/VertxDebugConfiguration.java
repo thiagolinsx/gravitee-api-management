@@ -16,6 +16,7 @@
 package io.gravitee.gateway.debug.vertx;
 
 import io.gravitee.gateway.debug.reactor.DebugReactor;
+import io.gravitee.gateway.debug.reactor.processor.DebugResponseProcessorChainFactory;
 import io.gravitee.gateway.reactor.Reactor;
 import io.gravitee.gateway.reactor.processor.NotFoundProcessorChainFactory;
 import io.gravitee.gateway.reactor.processor.RequestProcessorChainFactory;
@@ -64,7 +65,7 @@ public class VertxDebugConfiguration {
 
     @Bean
     public ResponseProcessorChainFactory responseProcessorChainFactory() {
-        return new ResponseProcessorChainFactory();
+        return new DebugResponseProcessorChainFactory();
     }
 
     @Bean
