@@ -3,12 +3,11 @@ package io.gravitee.gateway.debug.policy.impl;
 import io.gravitee.common.http.HttpHeaders;
 import io.gravitee.gateway.api.ExecutionContext;
 import io.gravitee.gateway.api.buffer.Buffer;
-import io.gravitee.gateway.api.http.stream.TransformableRequestStreamBuilder;
 import io.gravitee.gateway.api.stream.ReadWriteStream;
+import io.gravitee.gateway.debug.reactor.reactor.handler.context.DebugExecutionContext;
 import io.gravitee.gateway.policy.Policy;
 import io.gravitee.gateway.policy.PolicyException;
 import io.gravitee.gateway.policy.StreamType;
-import io.gravitee.gateway.policy.impl.DebugReadWriteStream;
 import io.gravitee.policy.api.PolicyChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +29,12 @@ public class DebugPolicy implements Policy {
 
     private Instant begin;
     private Instant end;
+    private final Instant creationDate;
 
     public DebugPolicy(StreamType streamType, Policy policy) {
         this.streamType = streamType;
         this.policy = policy;
+        creationDate = Instant.now();
     }
 
     @Override
@@ -43,18 +44,25 @@ public class DebugPolicy implements Policy {
 
     @Override
     public void execute(PolicyChain chain, ExecutionContext context) throws PolicyException {
-        LOGGER.info("------------- execute --------------------");
+        DebugExecutionContext debugContext = (DebugExecutionContext) context;
 
-        before(context);
+        debugContext.beginExecutingPolicy(this, streamType);
+//        LOGGER.info("------------- execute --------------------");
+
+//        before(context);
         policy.execute(chain, context);
-        after(context);
+//        after(context);
+
+        debugContext.exitExecutingPolicy(this, streamType);
     }
 
     @Override
     public ReadWriteStream<Buffer> stream(PolicyChain chain, ExecutionContext context) throws PolicyException {
-        LOGGER.info("------------- stream --------------------");
+        DebugExecutionContext debugContext = (DebugExecutionContext) context;
+//        LOGGER.info("------------- stream --------------------");
 
-        before(context);
+//        before(context);
+        debugContext.beginStreamingPolicy(this, streamType);
         final ReadWriteStream<Buffer> stream = policy.stream(chain, context);
 
         if (stream == null) {
@@ -70,13 +78,13 @@ public class DebugPolicy implements Policy {
 //            executionMap.
 //        }
 
-        var otherStream = new DebugReadWriteStream(context, stream, policy);
+        DebugReadWriteStream otherStream = new DebugReadWriteStream(debugContext, stream, this, streamType);
 //        otherStream.endHandler(result -> {
 //            final String content = otherStream.getContent();
 //            LOGGER.info("Body content: {}", content);
 //        });
 
-        after(context);
+//        after(context);
 
         return otherStream;
     }
@@ -132,4 +140,9 @@ public class DebugPolicy implements Policy {
             LOGGER.info("   {} - {}", key, String.join(",", values));
         });
     }
+
+//    @Override
+//    public int compareTo(DebugPolicy o) {
+//        return this.creationDate.compareTo(o.creationDate);
+//    }
 }

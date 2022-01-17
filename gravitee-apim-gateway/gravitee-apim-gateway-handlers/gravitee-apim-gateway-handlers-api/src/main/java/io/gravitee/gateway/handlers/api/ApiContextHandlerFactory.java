@@ -65,12 +65,11 @@ import io.gravitee.resource.api.ResourceManager;
 import io.vertx.core.Vertx;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.ResolvableType;
 
@@ -100,7 +99,17 @@ public class ApiContextHandlerFactory implements ReactorHandlerFactory<Api> {
 //    @Autowired
     private Node node;
     private Function<CompositeComponentProvider, ExecutionContextFactory> executionContextFactoryCreator;
+    private BiConsumer<Api, ExecutionContextFactory> executionContextFactoryConsumer;
     private Function<PolicyManager, PolicyChainFactory> policyChainFactoryCreator;
+
+    public ApiContextHandlerFactory(ApplicationContext applicationContext,
+                                    int maxSizeLogMessage,
+                                    String excludedResponseTypes,
+                                    boolean overrideXForwardedPrefix,
+                                    boolean classLoaderLegacyMode,
+                                    Node node) {
+        this(applicationContext, maxSizeLogMessage, excludedResponseTypes, overrideXForwardedPrefix, classLoaderLegacyMode, node, ExecutionContextFactory::new, (api, executionContextFactory) -> {}, PolicyChainFactory::new);
+    }
 
     public ApiContextHandlerFactory(ApplicationContext applicationContext,
                                     int maxSizeLogMessage,
@@ -109,6 +118,7 @@ public class ApiContextHandlerFactory implements ReactorHandlerFactory<Api> {
                                     boolean classLoaderLegacyMode,
                                     Node node,
                                     Function<CompositeComponentProvider, ExecutionContextFactory> executionContextFactoryCreator,
+                                    BiConsumer<Api, ExecutionContextFactory> executionContextFactoryConsumer,
                                     Function<PolicyManager, PolicyChainFactory> policyChainFactoryCreator) {
         this.applicationContext = applicationContext;
         this.maxSizeLogMessage = maxSizeLogMessage;
@@ -117,6 +127,7 @@ public class ApiContextHandlerFactory implements ReactorHandlerFactory<Api> {
         this.classLoaderLegacyMode = classLoaderLegacyMode;
         this.node = node;
         this.executionContextFactoryCreator = executionContextFactoryCreator;
+        this.executionContextFactoryConsumer = executionContextFactoryConsumer; // FIXME: trouver une meilleure solution pour setter l'eventId dans le context
         this.policyChainFactoryCreator = policyChainFactoryCreator;
     }
 
@@ -200,6 +211,7 @@ public class ApiContextHandlerFactory implements ReactorHandlerFactory<Api> {
                 handler.setResourceLifecycleManager(resourceLifecycleManager);
 
                 ExecutionContextFactory executionContextFactory = executionContextFactoryCreator.apply(apiComponentProvider);
+                executionContextFactoryConsumer.accept(api, executionContextFactory);
 
                 executionContextFactory.addTemplateVariableProvider(new ApiTemplateVariableProvider(api));
                 executionContextFactory.addTemplateVariableProvider(referenceRegister);

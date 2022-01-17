@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.gateway.policy.impl;
+package io.gravitee.gateway.debug.policy.impl;
 
 import io.gravitee.gateway.api.ExecutionContext;
 import io.gravitee.gateway.api.buffer.Buffer;
@@ -21,7 +21,9 @@ import io.gravitee.gateway.api.handler.Handler;
 import io.gravitee.gateway.api.stream.ReadStream;
 import io.gravitee.gateway.api.stream.ReadWriteStream;
 import io.gravitee.gateway.api.stream.WriteStream;
+import io.gravitee.gateway.debug.reactor.reactor.handler.context.DebugExecutionContext;
 import io.gravitee.gateway.policy.Policy;
+import io.gravitee.gateway.policy.StreamType;
 import io.gravitee.gateway.policy.impl.tracing.TracingPolicy;
 import io.gravitee.tracing.api.Span;
 import io.gravitee.tracing.api.Tracer;
@@ -35,17 +37,19 @@ import io.gravitee.tracing.api.Tracer;
 public class DebugReadWriteStream implements ReadWriteStream<Buffer> {
 
     private final ReadWriteStream<Buffer> stream;
+    private StreamType streamType;
 
     // On peut tout supprimer si on passe un handler dans le constructeur
-    private final Policy policy;
-    private ExecutionContext context;
+    private final DebugPolicy policy;
+    private DebugExecutionContext context;
     private Buffer buffer;
     private String content;
 
-    public DebugReadWriteStream(final ExecutionContext context, final ReadWriteStream<Buffer> stream, final Policy policy) {
+    public DebugReadWriteStream(final DebugExecutionContext context, final ReadWriteStream<Buffer> stream, final DebugPolicy policy, StreamType streamType) {
         this.context = context;
         this.policy = policy;
         this.stream = stream;
+        this.streamType = streamType;
         this.buffer = Buffer.buffer();
     }
 
@@ -53,7 +57,7 @@ public class DebugReadWriteStream implements ReadWriteStream<Buffer> {
     public ReadStream<Buffer> bodyHandler(Handler<Buffer> bodyHandler) {
         stream.bodyHandler(result -> {
             buffer.appendBuffer(result);
-            context.response().headers().add("gaet-deux", buffer.toString().replaceAll(System.lineSeparator(), ""));
+            context.exitStreamingPolicy(policy, streamType, buffer);
             bodyHandler.handle(result);
         });
 

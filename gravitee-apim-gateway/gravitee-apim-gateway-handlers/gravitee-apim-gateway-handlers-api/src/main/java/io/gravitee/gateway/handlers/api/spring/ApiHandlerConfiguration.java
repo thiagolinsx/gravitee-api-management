@@ -116,6 +116,6 @@ public class ApiHandlerConfiguration {
             @Value("${reporters.logging.excluded_response_types:#{null}}") String excludedResponseTypes,
             @Value("${handlers.request.headers.x-forwarded-prefix:false}") boolean overrideXForwardedPrefix,
             @Value("${classloader.legacy.enabled:true}") boolean classLoaderLegacyMode) {
-        return new ApiContextHandlerFactory(applicationContext, maxSizeLogMessage, excludedResponseTypes, overrideXForwardedPrefix, classLoaderLegacyMode, node, ExecutionContextFactory::new, PolicyChainFactory::new);
+        return new ApiContextHandlerFactory(applicationContext, maxSizeLogMessage, excludedResponseTypes, overrideXForwardedPrefix, classLoaderLegacyMode, node);
     }
 }

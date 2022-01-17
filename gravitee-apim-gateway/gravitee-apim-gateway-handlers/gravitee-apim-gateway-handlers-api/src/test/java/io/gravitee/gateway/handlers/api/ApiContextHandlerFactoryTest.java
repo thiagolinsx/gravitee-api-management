@@ -41,7 +41,7 @@ public class ApiContextHandlerFactoryTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        apiContextHandlerFactory = new ApiContextHandlerFactory(null, 10, null, true, true, null, ExecutionContextFactory::new, PolicyChainFactory::new);
+        apiContextHandlerFactory = new ApiContextHandlerFactory(null, 10, null, true, true, null);
     }
 
     @Test
