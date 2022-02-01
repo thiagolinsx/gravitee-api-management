@@ -15,7 +15,9 @@
  */
 package io.gravitee.rest.api.service.impl.upgrade;
 
+import io.gravitee.common.component.Lifecycle;
 import io.gravitee.common.data.domain.Page;
+import io.gravitee.definition.model.DefinitionContext;
 import io.gravitee.repository.management.api.EnvironmentRepository;
 import io.gravitee.repository.management.api.search.UserCriteria;
 import io.gravitee.repository.management.model.UserStatus;
@@ -87,6 +89,9 @@ public class SearchIndexUpgrader implements Upgrader, Ordered {
         apiService
             .findAllLight()
             .stream()
+            // Quick win: api created from K8S are marked STOPPED when deleted. We just exclude them from the search index for now.
+            // This must be better handled with an higher concept such as 'archiving' or something close.
+            .filter(api -> !DefinitionContext.isKubernetes(api.getDefinitionContext()) || api.getState() != Lifecycle.State.STOPPED)
             .forEach(
                 apiEntity -> {
                     String environmentId = apiEntity.getReferenceId();

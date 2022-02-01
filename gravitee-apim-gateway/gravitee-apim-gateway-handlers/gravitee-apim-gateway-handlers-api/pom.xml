@@ -124,6 +124,12 @@
             <artifactId>gravitee-node-cache</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>io.gravitee.definition</groupId>
+            <artifactId>gravitee-definition-jackson</artifactId>
+        </dependency>
+
+
         <!-- Vert.x -->
         <dependency>
             <groupId>io.vertx</groupId>

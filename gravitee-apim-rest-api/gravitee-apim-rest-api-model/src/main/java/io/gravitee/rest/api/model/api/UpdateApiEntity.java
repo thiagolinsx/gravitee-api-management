@@ -19,9 +19,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.gravitee.definition.jackson.datatype.api.deser.PropertiesAsListDeserializer;
 import io.gravitee.definition.model.*;
-import io.gravitee.definition.model.Properties;
 import io.gravitee.definition.model.flow.Flow;
 import io.gravitee.definition.model.plugins.resources.Resource;
 import io.gravitee.definition.model.services.Services;
@@ -97,6 +95,10 @@ public class UpdateApiEntity {
     @JsonProperty(value = "gravitee", required = false)
     @ApiModelProperty(value = "API's gravitee definition version")
     private String graviteeDefinitionVersion;
+
+    @JsonProperty(value = "definition_context")
+    @ApiModelProperty(value = "the context where the api definition was created from")
+    private DefinitionContext definitionContext;
 
     @DeploymentRequired
     @JsonProperty(value = "flow_mode")
@@ -376,5 +378,13 @@ public class UpdateApiEntity {
 
     public void setCrossId(String crossId) {
         this.crossId = crossId;
+    }
+
+    public DefinitionContext getDefinitionContext() {
+        return definitionContext;
+    }
+
+    public void setDefinitionContext(DefinitionContext definitionContext) {
+        this.definitionContext = definitionContext;
     }
 }
