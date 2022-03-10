@@ -18,19 +18,18 @@ package io.gravitee.rest.api.service.impl.upgrade;
 import static io.gravitee.rest.api.service.impl.upgrade.UpgradeStatus.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.gravitee.node.api.upgrader.Upgrader;
 import io.gravitee.repository.management.api.ApiRepository;
 import io.gravitee.repository.management.model.Api;
 import io.gravitee.rest.api.model.InstallationEntity;
 import io.gravitee.rest.api.service.InstallationService;
-import io.gravitee.rest.api.service.Upgrader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ApiLoggingConditionUpgrader implements Upgrader, Ordered {
+public class ApiLoggingConditionUpgrader implements Upgrader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiLoggingConditionUpgrader.class);
 
