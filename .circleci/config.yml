@@ -282,6 +282,7 @@ jobs:
                   root: ./
                   paths:
                       - ./gravitee-*/*/target/*
+                      - ./gravitee-apim-rest-api/gravitee-apim-rest-api-standalone/gravitee-apim-rest-api-standalone-distribution/gravitee-apim-rest-api-standalone-distribution-zip/target/*
                       - ./rest-api-docker-context
                       - ./gateway-docker-context
 
@@ -981,6 +982,40 @@ jobs:
                   command: |
                       mvn clean deploy --activate-profiles gravitee-release --batch-mode -DskipTests -Dskip.validation=true --settings .gravitee.settings.xml --update-snapshots
 
+    run_postman_tests:
+        docker:
+            - image: cimg/openjdk:11.0-node
+            - image: mongo:4.4
+        resource_class: medium
+        steps:
+            - checkout
+            - attach_workspace:
+                  at: .
+            - run:
+                  name: Wait for Mongo to be up and running
+                  command: timeout 15s bash -c 'until nc -vz localhost 27017; do sleep 2; done'
+            - run:
+                  name: Install Newman
+                  command: sudo npm i -g newman
+            - run:
+                  name: Run API and Postman tests
+                  command: |
+                      # Prepare Cockpit and license key
+                      mv gravitee-apim-rest-api/gravitee-apim-rest-api-standalone/gravitee-apim-rest-api-standalone-distribution/gravitee-apim-rest-api-standalone-distribution-zip/target/gravitee-apim-rest-api-standalone-*.zip gravitee-apim-rest-api-standalone.zip 
+                      unzip gravitee-apim-rest-api-standalone.zip
+                      mv gravitee-apim-rest-api-standalone-* gravitee-apim-rest-api-standalone
+
+                      # Start Cockpit in background
+                      gravitee-apim-rest-api-standalone/bin/gravitee &
+                      # Wait for Cockpit to be up and running
+                      timeout 30s bash -c 'until nc -vz localhost 8062; do sleep 2; done'
+                      # Run Postman tests
+                      cd gravitee-apim-rest-api && make postman
+            - slack/notify:
+                  branch_pattern: master
+                  event: fail
+                  template: basic_fail_1
+
 workflows:
     pull_requests:
         when:
@@ -1000,6 +1035,14 @@ workflows:
             - test:
                   requires:
                       - build
+            - run_postman_tests:
+                  requires:
+                      - build
+                  filters:
+                      branches:
+                          only:
+                              - master
+                              - 6780-add-postman-tests-in-ci
             - sonarcloud-analysis:
                   name: Sonar - << matrix.working_directory >>
                   matrix:
