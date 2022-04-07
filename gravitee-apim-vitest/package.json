@@ -1,0 +1,20 @@
+{
+  "name": "vitest-test",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "axios": "^0.26.1",
+    "@vitest/ui": "latest",
+    "vite": "latest",
+    "vitest": "^0.8.4",
+    "@faker-js/faker": "^6.1.2"
+  }
+}
