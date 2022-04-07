@@ -10,7 +10,7 @@ commands:
                 severity-threshold: critical
                 docker-image-name: ${IMAGE_TAG}
                 fail-on-issues: false
-                project: "graviteeio/apim-portal-ui"
+                project: "APIM"
                
 jobs:
     publish_prod_docker_images:
