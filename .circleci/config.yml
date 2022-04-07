@@ -1,12 +1,6 @@
 version: 2.1
-
 orbs:
-    slack: circleci/slack@4.4.4
-    gravitee: gravitee-io/gravitee@1.0.38
-    gh: circleci/github-cli@1.0.4
     snyk: snyk/snyk@1.1.2
-    keeper: gravitee-io/keeper@0.6.2
-
 commands:
     docker-scan:
         steps:
@@ -16,7 +10,7 @@ commands:
                 severity-threshold: critical
                 docker-image-name: ${IMAGE_TAG}
                 fail-on-issues: false
-               
+                
 jobs:
     publish_prod_docker_images:
         docker:
@@ -34,4 +28,4 @@ jobs:
 workflows:
     pull_requests:
         jobs:
-            - publish_prod_docker_images:
+            - publish_prod_docker_images
