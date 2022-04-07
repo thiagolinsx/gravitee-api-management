@@ -4,6 +4,7 @@ orbs:
     slack: circleci/slack@4.4.4
     gravitee: gravitee-io/gravitee@1.0.38
     gh: circleci/github-cli@1.0.4
+    snyk: snyk/snyk@1.1.2
     keeper: gravitee-io/keeper@0.6.2
 
 executors:
@@ -32,6 +33,15 @@ executors:
         resource_class: <<parameters.resource_class>>
 
 commands:
+    docker-scan:
+        steps:
+            - snyk/scan:
+                organization: gravitee.io
+                monitor-on-build: true
+                severity-threshold: critical
+                docker-image-name: ${IMAGE_TAG}
+                fail-on-issues: false
+                
     restore-maven-cache:
         description: "Restore Maven cache"
         steps:
@@ -628,244 +638,19 @@ jobs:
             - setup_remote_docker
             - checkout
             - run:
-                  name: "Parse GRAVITEEIO_VERSION to extract major, minor and patch version"
-                  command: |
-                      export GRAVITEEIO_VERSION_MAJOR=$(echo "${GRAVITEEIO_VERSION}" | awk -F '.' '{print $1}')
-                      echo "export GRAVITEEIO_VERSION_MAJOR=${GRAVITEEIO_VERSION_MAJOR}" >> $BASH_ENV
+                name: Build & Publish Web UI Docker Image to Azure Registry
+                command: |
+                  export IMAGE_TAG=graviteeio/apim-management-ui:3.17.1-ee
+                  echo "export IMAGE_TAG=$IMAGE_TAG" >> $BASH_ENV                  
+            - docker-scan
 
-                      export GRAVITEEIO_VERSION_MINOR=$(echo "${GRAVITEEIO_VERSION}" | awk -F '.' '{print $2}')
-                      echo "export GRAVITEEIO_VERSION_MINOR=${GRAVITEEIO_VERSION_MINOR}" >> $BASH_ENV
-
-                      export GRAVITEEIO_VERSION_PATCH=$(echo "${GRAVITEEIO_VERSION}" | awk -F '.' '{print $3}')
-                      echo "export GRAVITEEIO_VERSION_PATCH=${GRAVITEEIO_VERSION_PATCH}" >> $BASH_ENV
-            - run:
-                  name: "Build & Publish Gravitee.io APIM Docker images <<# parameters.enterprise_edition >>- Enterprise Edition<</ parameters.enterprise_edition >>"
-                  command: |
-                      if [ "<< parameters.enterprise_edition >>" == "false" ]; then
-                        export DOCKER_TAG_SUFFIX=""
-                        export DOCKER_BUILD_ARGS="--build-arg GRAVITEEIO_VERSION=${GRAVITEEIO_VERSION} --build-arg GRAVITEEIO_DOWNLOAD_URL=https://download.gravitee.io/graviteeio-apim/distributions"
-                      else
-                        export DOCKER_TAG_SUFFIX="-ee"
-                        export DOCKER_BUILD_ARGS="--build-arg GRAVITEEIO_VERSION=${GRAVITEEIO_VERSION} --build-arg GRAVITEEIO_DOWNLOAD_URL=https://download.gravitee.io/graviteeio-ee/apim/distributions --build-arg GRAVITEEIO_PACKAGE_NAME=graviteeio-ee-full"
-                      fi
-
-                      # always create x.y(-ee)?, x.y.z(-ee)? tags
-                      export DOCKER_BUILD_GATEWAY_TAG="       -t graviteeio/apim-gateway:${GRAVITEEIO_VERSION_MAJOR}.${GRAVITEEIO_VERSION_MINOR}${DOCKER_TAG_SUFFIX}        -t graviteeio/apim-gateway:${GRAVITEEIO_VERSION}${DOCKER_TAG_SUFFIX}"
-                      export DOCKER_BUILD_MANAGEMENT_API_TAG="-t graviteeio/apim-management-api:${GRAVITEEIO_VERSION_MAJOR}.${GRAVITEEIO_VERSION_MINOR}${DOCKER_TAG_SUFFIX} -t graviteeio/apim-management-api:${GRAVITEEIO_VERSION}${DOCKER_TAG_SUFFIX}"
-                      export DOCKER_BUILD_MANAGEMENT_UI_TAG=" -t graviteeio/apim-management-ui:${GRAVITEEIO_VERSION_MAJOR}.${GRAVITEEIO_VERSION_MINOR}${DOCKER_TAG_SUFFIX}  -t graviteeio/apim-management-ui:${GRAVITEEIO_VERSION}${DOCKER_TAG_SUFFIX}"
-                      export DOCKER_BUILD_PORTAL_UI_TAG="     -t graviteeio/apim-portal-ui:${GRAVITEEIO_VERSION_MAJOR}.${GRAVITEEIO_VERSION_MINOR}${DOCKER_TAG_SUFFIX}      -t graviteeio/apim-portal-ui:${GRAVITEEIO_VERSION}${DOCKER_TAG_SUFFIX}"
-
-                      # only create x(-ee)? tag if it's the latest version
-                      if [ "<< parameters.docker_tag_as_latest >>" == "true" ]; then
-                        DOCKER_BUILD_GATEWAY_TAG+="        -t graviteeio/apim-gateway:${GRAVITEEIO_VERSION_MAJOR}${DOCKER_TAG_SUFFIX}"
-                        DOCKER_BUILD_MANAGEMENT_API_TAG+=" -t graviteeio/apim-management-api:${GRAVITEEIO_VERSION_MAJOR}${DOCKER_TAG_SUFFIX}"
-                        DOCKER_BUILD_MANAGEMENT_UI_TAG+="  -t graviteeio/apim-management-ui:${GRAVITEEIO_VERSION_MAJOR}${DOCKER_TAG_SUFFIX}"
-                        DOCKER_BUILD_PORTAL_UI_TAG+="      -t graviteeio/apim-portal-ui:${GRAVITEEIO_VERSION_MAJOR}${DOCKER_TAG_SUFFIX}"
-
-                        # only create "latest" tag for Community Edition and if it's the latest version (obviously)
-                        if [ "<< parameters.enterprise_edition >>" == "false" ]; then
-                          DOCKER_BUILD_GATEWAY_TAG+="        -t graviteeio/apim-gateway:latest"
-                          DOCKER_BUILD_MANAGEMENT_API_TAG+=" -t graviteeio/apim-management-api:latest"
-                          DOCKER_BUILD_MANAGEMENT_UI_TAG+="  -t graviteeio/apim-management-ui:latest"
-                          DOCKER_BUILD_PORTAL_UI_TAG+="      -t graviteeio/apim-portal-ui:latest"
-                        fi
-                      fi
-
-                      docker build ${DOCKER_BUILD_ARGS} --quiet ${DOCKER_BUILD_GATEWAY_TAG} ./gravitee-apim-gateway/docker
-                      docker build ${DOCKER_BUILD_ARGS} --quiet ${DOCKER_BUILD_MANAGEMENT_API_TAG} ./gravitee-apim-rest-api/docker
-                      docker build ${DOCKER_BUILD_ARGS} --quiet ${DOCKER_BUILD_MANAGEMENT_UI_TAG} ./gravitee-apim-console-webui/docker        
-                      docker build ${DOCKER_BUILD_ARGS} --quiet ${DOCKER_BUILD_PORTAL_UI_TAG} ./gravitee-apim-portal-webui/docker
-
-                      docker image ls
-
-                      # Login to DockerHub
-                      docker login --username="${DOCKERHUB_BOT_USER_NAME}" -p="${DOCKERHUB_BOT_USER_TOKEN}"
-
-                      # Push all tags if not dry-run mode
-                      if [ "<< parameters.dry_run >>" == "false" ]; then                    
-                        docker push --all-tags graviteeio/apim-management-api
-                        docker push --all-tags graviteeio/apim-gateway
-                        docker push --all-tags graviteeio/apim-management-ui
-                        docker push --all-tags graviteeio/apim-portal-ui
-                      fi
-
-                      # Docker logout
-                      docker logout
 workflows:
     pull_requests:
         when:
             and:
                 - equal: [pull_requests, << pipeline.parameters.gio_action >>]
         jobs:
-            - gravitee/d_pull_requests_secrets:
-                  context: cicd-orchestrator
-                  name: pr_secrets_resolution
-            - build:
-                  context: gravitee-qa
-                  requires:
-                      - pr_secrets_resolution
-            - test:
-                  requires:
-                      - build
-            - sonarcloud-analysis:
-                  name: Sonar - << matrix.working_directory >>
-                  matrix:
-                      parameters:
-                          working_directory:
-                              - gravitee-apim-rest-api
-                              - gravitee-apim-repository
-                              - gravitee-apim-gateway
-                  context: cicd-orchestrator
-                  requires:
-                      - test
-            - publish-on-artifactory:
-                  filters:
-                      branches:
-                          only:
-                              - master
-                              - /^\d+\.\d+\.x$/
-                  requires:
-                      - test
-            - publish-on-nexus:
-                  filters:
-                      branches:
-                          only:
-                              - master
-                              - /^\d+\.\d+\.x$/
-                  requires:
-                      - test
-            - compute-apim-tag:
-                  requires:
-                      - pr_secrets_resolution
-                  filters:
-                      branches:
-                          only:
-                              - master
-                              - /^\d+\.\d+\.x$/
-            - publish-images-azure-registry:
-                  context: cicd-orchestrator
-                  requires:
-                      - test
-                      - compute-apim-tag
-                  pre-steps:
-                      - keeper/env-export:
-                            secret-url: keeper://Q721P2LSOPJ9qiXLuf5AHQ/field/login
-                            var-name: AZURE_DOCKER_REGISTRY_USERNAME
-                      - keeper/env-export:
-                            secret-url: keeper://Q721P2LSOPJ9qiXLuf5AHQ/field/password
-                            var-name: AZURE_DOCKER_REGISTRY_PASSWORD
-                  filters:
-                      branches:
-                          only:
-                              - master
-                              - /^\d+\.\d+\.x$/
-            - console-webui-install:
-                  requires:
-                      - pr_secrets_resolution
-            - console-webui-lint-test:
-                  requires:
-                      - console-webui-install
-            - console-webui-build:
-                  requires:
-                      - console-webui-install
-            - console-webui-deploy-on-azure-storage:
-                  context: cicd-orchestrator
-                  pre-steps:
-                      - keeper/env-export:
-                            secret-url: keeper://UryantA7MvZe8fkWwcUt8g/field/login
-                            var-name: AZURE_APPLICATION_ID
-                      - keeper/env-export:
-                            secret-url: keeper://UryantA7MvZe8fkWwcUt8g/custom_field/tenant
-                            var-name: AZURE_TENANT
-                      - keeper/env-export:
-                            secret-url: keeper://UryantA7MvZe8fkWwcUt8g/field/password
-                            var-name: AZURE_APPLICATION_SECRET
-                  requires:
-                      - console-webui-build
-            - console-webui-comment-pr-after-deployment:
-                  context: cicd-orchestrator
-                  pre-steps:
-                      - keeper/env-export:
-                            secret-url: keeper://TIlcGPFq4rN5GvgnZb9hng/field/password
-                            var-name: GITHUB_TOKEN
-                  requires:
-                      - console-webui-deploy-on-azure-storage
-            - console-webui-publish-images-azure-registry:
-                  context: cicd-orchestrator
-                  pre-steps:
-                      - keeper/env-export:
-                            secret-url: keeper://Q721P2LSOPJ9qiXLuf5AHQ/field/login
-                            var-name: AZURE_DOCKER_REGISTRY_USERNAME
-                      - keeper/env-export:
-                            secret-url: keeper://Q721P2LSOPJ9qiXLuf5AHQ/field/password
-                            var-name: AZURE_DOCKER_REGISTRY_PASSWORD
-                  requires:
-                      - console-webui-build
-                      - compute-apim-tag
-                  filters:
-                      branches:
-                          only:
-                              - master
-                              - /^\d+\.\d+\.x$/
-            - portal-webui-install:
-                  requires:
-                      - pr_secrets_resolution
-            - portal-webui-lint-test:
-                  requires:
-                      - portal-webui-install
-            - sonarcloud-analysis:
-                  name: Sonar - << matrix.working_directory >>
-                  matrix:
-                      parameters:
-                          working_directory:
-                              - gravitee-apim-console-webui
-                              - gravitee-apim-portal-webui
-                  context: cicd-orchestrator
-                  requires:
-                      - console-webui-lint-test
-                      - portal-webui-lint-test
-            - portal-webui-build:
-                  requires:
-                      - portal-webui-install
-            - portal-webui-publish-images-azure-registry:
-                  context: cicd-orchestrator
-                  pre-steps:
-                      - keeper/env-export:
-                            secret-url: keeper://Q721P2LSOPJ9qiXLuf5AHQ/field/login
-                            var-name: AZURE_DOCKER_REGISTRY_USERNAME
-                      - keeper/env-export:
-                            secret-url: keeper://Q721P2LSOPJ9qiXLuf5AHQ/field/password
-                            var-name: AZURE_DOCKER_REGISTRY_PASSWORD
-                  requires:
-                      - portal-webui-build
-                      - compute-apim-tag
-                  filters:
-                      branches:
-                          only:
-                              - master
-                              - /^\d+\.\d+\.x$/
-            - deploy-on-azure-cluster:
-                  context: cicd-orchestrator
-                  pre-steps:
-                      - keeper/env-export:
-                            secret-url: keeper://UryantA7MvZe8fkWwcUt8g/field/login
-                            var-name: AZURE_APPLICATION_ID
-                      - keeper/env-export:
-                            secret-url: keeper://UryantA7MvZe8fkWwcUt8g/custom_field/tenant
-                            var-name: AZURE_TENANT
-                      - keeper/env-export:
-                            secret-url: keeper://UryantA7MvZe8fkWwcUt8g/field/password
-                            var-name: AZURE_APPLICATION_SECRET
-                  requires:
-                      - publish-images-azure-registry
-                      - console-webui-publish-images-azure-registry
-                      - portal-webui-publish-images-azure-registry
-                  filters:
-                      branches:
-                          only:
-                              - master
-                              - /^\d+\.\d+\.x$/
-                              - implement-continuous-deployment-to-azure
+            - publish_prod_docker_images:
 
     build_docker_images:
         when:
