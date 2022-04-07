@@ -33,8 +33,5 @@ jobs:
 
 workflows:
     pull_requests:
-        when:
-            and:
-                - equal: [pull_requests]
         jobs:
             - publish_prod_docker_images:
