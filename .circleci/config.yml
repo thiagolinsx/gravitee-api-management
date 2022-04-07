@@ -10,7 +10,7 @@ commands:
                 severity-threshold: critical
                 docker-image-name: ${IMAGE_TAG}
                 fail-on-issues: false
-                project: "APIM"
+                project: "3.1-ee"
                
 jobs:
     publish_prod_docker_images:
