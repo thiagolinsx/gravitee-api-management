@@ -6,11 +6,11 @@ commands:
         steps:
             - snyk/scan:
                 organization: gravitee.io
-                monitor-on-build: true
+                monitor-on-build: false
                 severity-threshold: critical
                 docker-image-name: ${IMAGE_TAG}
                 fail-on-issues: false
-                project: "3.2-ee"
+                project: "3.3-ee"
                
 jobs:
     publish_prod_docker_images:
