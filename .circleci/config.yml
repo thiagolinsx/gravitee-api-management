@@ -10,8 +10,7 @@ commands:
                 severity-threshold: critical
                 docker-image-name: ${IMAGE_TAG}
                 fail-on-issues: false
-                project: false
-                
+               
 jobs:
     publish_prod_docker_images:
         docker:
@@ -22,7 +21,7 @@ jobs:
             - run:
                 name: Build & Publish Web UI Docker Image to Azure Registry
                 command: |
-                  export IMAGE_TAG=graviteeio/apim-management-ui:3.17.1-ee
+                  export IMAGE_TAG=graviteeio/apim-portal-ui:3.1-ee
                   echo "export IMAGE_TAG=$IMAGE_TAG" >> $BASH_ENV                  
             - docker-scan
 
