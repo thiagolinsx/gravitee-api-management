@@ -8,9 +8,9 @@ commands:
                 organization: gravitee.io
                 monitor-on-build: true
                 severity-threshold: critical
-                docker-image-name: ${IMAGE_TAG}
+                docker-image-name: ${IMAGE}
                 fail-on-issues: false
-                project: "3.3-ee"
+                project: ${IMAGE_TAG}
                
 jobs:
     publish_prod_docker_images:
@@ -22,8 +22,10 @@ jobs:
             - run:
                 name: Build & Publish Web UI Docker Image to Azure Registry
                 command: |
-                  export IMAGE_TAG=graviteeio/apim-portal-ui:3.1-ee
-                  echo "export IMAGE_TAG=$IMAGE_TAG" >> $BASH_ENV                  
+                  export IMAGE_TAG="3.1-ee"
+                  export IMAGE="graviteeio/apim-portal-ui" + ":3.1-ee"
+                  echo $IMAGE
+                  echo $IMAGE_TAG"                  
             - docker-scan
 
 workflows:
