@@ -32,7 +32,7 @@ jobs:
                   export IMAGE="$IMAGE1$IMAGE_TAG"
                   echo "export IMAGE=$IMAGE" >> $BASH_ENV
                   echo "export IMAGE_TAG=$IMAGE_TAG" >> $BASH_ENV
-                  export << parameters.version >>="test"
+                  << parameters.version >>="test"
                   echo << parameters.version >>
             - when:
                   condition:
@@ -43,5 +43,6 @@ jobs:
 workflows:
     pull_requests:
         jobs:
-            - publish_prod_docker_images
+            - publish_prod_docker_images:
+                 version: "test-sakthi"
            
