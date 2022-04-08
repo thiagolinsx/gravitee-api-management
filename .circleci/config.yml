@@ -4,6 +4,10 @@ orbs:
 commands:
     docker-scan:
         steps:
+            - run:
+                command: |
+                  export IMAGE="$IMAGE1:$IMAGE_TAG"
+                  echo "export IMAGE=$IMAGE" >> $BASH_ENV
             - snyk/scan:
                 organization: gravitee.io
                 monitor-on-build: true
@@ -24,14 +28,11 @@ jobs:
             - setup_remote_docker
             - checkout
             - run:
-                name: Build & Publish Web UI Docker Image to Azure Registry
                 command: |
                   export IMAGE_TAG="3.1-ee"
                   export IMAGE1="graviteeio/apim-portal-ui"
-                  export IMAGE="$IMAGE1:$IMAGE_TAG"
-                  echo "export IMAGE=$IMAGE" >> $BASH_ENV
                   echo "export IMAGE_TAG=$IMAGE_TAG" >> $BASH_ENV
-                  echo << parameters.dry_run >>
+                  echo "export IMAGE1=$IMAGE1" >> $BASH_ENV
             - when:
                   condition:
                       equal: [false, << parameters.dry_run >>]
