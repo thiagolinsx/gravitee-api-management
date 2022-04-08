@@ -35,7 +35,7 @@ jobs:
                   customer: "test"
             - when: 
                 and: 
-                    - equal: [test, << pipeline.parameters.gio_action >>]  
+                    - equal: ["test", << pipeline.parameters >>]  
                 steps:
                     - docker-scan
 
