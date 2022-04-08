@@ -1,11 +1,7 @@
 version: 2.1
 orbs:
     snyk: snyk/snyk@1.1.2
-parameters:
-    version:
-      type: string
-      description: version of the database to test
-      default: "xyz"   
+  
 
 commands:
     docker-scan:
@@ -20,6 +16,11 @@ commands:
                
 jobs:
     publish_prod_docker_images:
+        parameters:
+            version:
+              type: string
+              description: version of the database to test
+              default: "xyz" 
         docker:
             - image: cimg/base:stable
         steps:
