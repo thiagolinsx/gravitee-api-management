@@ -139,6 +139,7 @@ management:
 
 ## SSL settings
 #    sslEnabled:                  # mongodb ssl mode (default false)
+#    tlsProtocol:                 # protocol to use when connecting to the mongodb instance (when sslEnabled is true, default value is provided by the JVM)
 #    keystore:
 #      path:                      # Path to the keystore (when sslEnabled is true, default null)
 #      type:                      # Type of the keystore, supports jks, pem, pkcs12 (when sslEnabled is true, default null)

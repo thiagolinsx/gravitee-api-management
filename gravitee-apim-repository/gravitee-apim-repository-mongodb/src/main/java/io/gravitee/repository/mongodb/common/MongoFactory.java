@@ -145,7 +145,8 @@ public class MongoFactory implements FactoryBean<MongoClient> {
 
         if (sslEnabled) {
             try {
-                SSLContext sslContext = SSLContext.getInstance("TLS");
+                String tlsProtocol = readPropertyValue(propertyPrefix + "tlsProtocol", String.class, SSLContext.getDefault().getProtocol());
+                SSLContext sslContext = SSLContext.getInstance(tlsProtocol);
                 sslContext.init(getKeyManagers(), getTrustManagers(), null);
                 sslBuilder.context(sslContext);
             } catch (NoSuchAlgorithmException | KeyManagementException e) {
