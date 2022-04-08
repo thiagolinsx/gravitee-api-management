@@ -31,7 +31,7 @@ jobs:
                   export IMAGE="$IMAGE1:$IMAGE_TAG"
                   echo "export IMAGE=$IMAGE" >> $BASH_ENV
                   echo "export IMAGE_TAG=$IMAGE_TAG" >> $BASH_ENV
-                  echo << parameters.version >>
+                  echo << parameters.dry_run >>
             - when:
                   condition:
                       equal: [false, << parameters.dry_run >>]
