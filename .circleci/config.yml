@@ -14,6 +14,11 @@ commands:
                
 jobs:
     publish_prod_docker_images:
+        parameters:
+            version:
+                type: string
+                description: version of the database to test
+                default: ""    
         docker:
             - image: cimg/base:stable
         steps:
@@ -26,8 +31,13 @@ jobs:
                   export IMAGE1="graviteeio/apim-portal-ui"
                   export IMAGE="$IMAGE1$IMAGE_TAG"
                   echo "export IMAGE=$IMAGE" >> $BASH_ENV
-                  echo "export IMAGE_TAG=$IMAGE_TAG" >> $BASH_ENV  
-                  docker-scan
+                  echo "export IMAGE_TAG=$IMAGE_TAG" >> $BASH_ENV
+                  customer: "test"
+            - when: 
+                and: 
+                    - equal: [test, << pipeline.parameters.gio_action >>]  
+                steps:
+                    - docker-scan
 
 workflows:
     pull_requests:
