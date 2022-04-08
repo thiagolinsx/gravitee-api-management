@@ -132,6 +132,26 @@ commands:
                   key: << parameters.apim-ui-project >>-cache-v1-{{ checksum "<< parameters.apim-ui-project >>/package-lock.json" }}
                   paths:
                       - ./<< parameters.apim-ui-project >>/node_modules
+    docker-snyk-scan:
+        parameters:
+            docker-image-name:
+                type: string
+                default: ""
+                description: The name of the docker image to scan (without the version)
+            version:
+                type: string
+                default: ""
+                description: Version of the Docker image to scan
+        steps:
+            - run:
+                  name: Install Snyk CLI
+                  command: |
+                      sudo npm install snyk -g                          
+                      snyk auth $SNYK_TOKEN
+            - run:
+                  name: Snyk monitor << parameters.docker-image-name >>:<< parameters.version >>
+                  command: |
+                      snyk container monitor << parameters.docker-image-name >>:<< parameters.version >> --project-name=<< parameters.version >> --app-vulns --project-lifecycle=production -d
 
 parameters:
     gio_action:
@@ -970,7 +990,7 @@ jobs:
                 default: ""
                 type: string
         docker:
-            - image: cimg/base:stable
+            - image: cimg/node:lts
         environment:
             GRAVITEEIO_VERSION: << parameters.graviteeio_version >>
         steps:
@@ -1037,7 +1057,7 @@ jobs:
                       docker login --username="${DOCKERHUB_BOT_USER_NAME}" -p="${DOCKERHUB_BOT_USER_TOKEN}"
 
                       # Push all tags if not dry-run mode
-                      if [ "<< parameters.dry_run >>" == "false" ]; then                    
+                      if [ "<< parameters.dry_run >>" == "false" ]; then
                         docker push --all-tags graviteeio/apim-management-api
                         docker push --all-tags graviteeio/apim-gateway
                         docker push --all-tags graviteeio/apim-management-ui
@@ -1046,6 +1066,24 @@ jobs:
 
                       # Docker logout
                       docker logout
+
+            - when:
+                  condition:
+                      #                     FIXME: Set to false, it's to true just to test in CI
+                      equal: [true, << parameters.dry_run >>]
+                  steps:
+                      - docker-snyk-scan:
+                            docker-image-name: graviteeio/apim-management-api
+                            version: << parameters.graviteeio_version >><<# parameters.enterprise_edition >>-ee<</ parameters.enterprise_edition >>
+                      - docker-snyk-scan:
+                            docker-image-name: graviteeio/apim-gateway
+                            version: << parameters.graviteeio_version >><<# parameters.enterprise_edition >>-ee<</ parameters.enterprise_edition >>
+                      - docker-snyk-scan:
+                            docker-image-name: graviteeio/apim-management-ui
+                            version: << parameters.graviteeio_version >><<# parameters.enterprise_edition >>-ee<</ parameters.enterprise_edition >>
+                      - docker-snyk-scan:
+                            docker-image-name: graviteeio/apim-portal-ui
+                            version: << parameters.graviteeio_version >><<# parameters.enterprise_edition >>-ee<</ parameters.enterprise_edition >>
 
     nexus-staging:
         docker:
@@ -1223,17 +1261,17 @@ jobs:
             - run:
                   name: "Building and publishing RPMs"
                   command: |
-                        export GIT_GRAVITEE_PACKAGES_REPO=$(mktemp -d)
-                        git clone git@github.com:gravitee-io/packages.git ${GIT_GRAVITEE_PACKAGES_REPO}
-                        
-                        cd ${GIT_GRAVITEE_PACKAGES_REPO}/apim/3.x
-                        ./build.sh -v << parameters.graviteeio_version >>
-                    
-                        if [ "<< parameters.dry_run >>" == "false" ]; then
-                            docker run --rm -v "${GIT_GRAVITEE_PACKAGES_REPO}/apim/3.x:/packages" -e PACKAGECLOUD_TOKEN=${GIO_PACKAGECLOUD_TOKEN} digitalocean/packagecloud push --yes --skip-errors --verbose graviteeio/rpms/el/7 /packages/*.rpm
-                        else
-                            echo " This is just a DRY RUN , no RPMs will  be published"
-                        fi;
+                      export GIT_GRAVITEE_PACKAGES_REPO=$(mktemp -d)
+                      git clone git@github.com:gravitee-io/packages.git ${GIT_GRAVITEE_PACKAGES_REPO}
+
+                      cd ${GIT_GRAVITEE_PACKAGES_REPO}/apim/3.x
+                      ./build.sh -v << parameters.graviteeio_version >>
+
+                      if [ "<< parameters.dry_run >>" == "false" ]; then
+                          docker run --rm -v "${GIT_GRAVITEE_PACKAGES_REPO}/apim/3.x:/packages" -e PACKAGECLOUD_TOKEN=${GIO_PACKAGECLOUD_TOKEN} digitalocean/packagecloud push --yes --skip-errors --verbose graviteeio/rpms/el/7 /packages/*.rpm
+                      else
+                          echo " This is just a DRY RUN , no RPMs will  be published"
+                      fi;
 workflows:
     pull_requests:
         when:
@@ -1434,7 +1472,7 @@ workflows:
                   enterprise_edition: true
                   context: cicd-orchestrator
                   name: Build and push docker images for APIM EE << pipeline.parameters.graviteeio_version >><<# pipeline.parameters.dry_run >> - Dry Run<</ pipeline.parameters.dry_run >>
-            -  publish_rpm_packages:
+            - publish_rpm_packages:
                   context: cicd-orchestrator
                   graviteeio_version: << pipeline.parameters.graviteeio_version >>
                   dry_run: << pipeline.parameters.dry_run >>
