@@ -35,7 +35,8 @@ jobs:
                   #version: "test"
                   echo << parameters.version >>
             - when:
-                  equal: [test, << pipeline.parameters.version >>]
+                  condition:
+                      equal: [test, << pipeline.parameters.version >>]
                   steps:
                       - docker-scan
 
