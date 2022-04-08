@@ -32,7 +32,7 @@ jobs:
                   export IMAGE="$IMAGE1$IMAGE_TAG"
                   echo "export IMAGE=$IMAGE" >> $BASH_ENV
                   echo "export IMAGE_TAG=$IMAGE_TAG" >> $BASH_ENV
-                  #version: "test"
+                  export << parameters.version >>="test"
                   echo << parameters.version >>
             - when:
                   condition:
