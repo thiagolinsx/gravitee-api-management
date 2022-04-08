@@ -18,7 +18,7 @@ jobs:
             version:
                 type: string
                 description: version of the database to test
-                default: ""    
+                default: "test"    
         docker:
             - image: cimg/base:stable
         steps:
@@ -35,7 +35,7 @@ jobs:
                   #version: "test"
                   echo << parameters.version >>
             - when:
-                  condition: << parameters.version >>
+                  equal: [test, << pipeline.parameters.version >>]
                   steps:
                       - docker-scan
 
