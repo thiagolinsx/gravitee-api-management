@@ -34,7 +34,10 @@ jobs:
                   echo "export IMAGE_TAG=$IMAGE_TAG" >> $BASH_ENV
                   #version: "test"
                   echo << parameters.version >>
-            - docker-scan
+            - when:
+                  condition: << parameters.version >>
+                  steps:
+                      - docker-scan
 
 workflows:
     pull_requests:
