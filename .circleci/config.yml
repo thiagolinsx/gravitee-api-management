@@ -26,7 +26,7 @@ jobs:
                   IMAGE1="graviteeio/apim-portal-ui"
                   IMAGE="$IMAGE1$IMAGE_TAG"
                   echo $IMAGE
-                  echo $IMAGE_TAG"                  
+                  echo $IMAGE_TAG                 
             - docker-scan
 
 workflows:
