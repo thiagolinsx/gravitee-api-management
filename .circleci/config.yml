@@ -15,10 +15,9 @@ commands:
 jobs:
     publish_prod_docker_images:
         parameters:
-            version:
-              type: string
-              description: version of the database to test
-              default: "xyz" 
+            dry_run:
+              type: boolean
+              default: true
         docker:
             - image: cimg/base:stable
         steps:
@@ -35,7 +34,7 @@ jobs:
                   echo << parameters.version >>
             - when:
                   condition:
-                      equal: [test, << parameters.version >>]
+                      equal: [false, << parameters.dry_run >>]
                   steps:
                       - docker-scan
 
@@ -43,5 +42,5 @@ workflows:
     pull_requests:
         jobs:
             - publish_prod_docker_images:
-                 version: "test"
+                 version: false
            
