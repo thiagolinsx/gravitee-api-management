@@ -22,8 +22,9 @@ jobs:
             - run:
                 name: Build & Publish Web UI Docker Image to Azure Registry
                 command: |
-                  export IMAGE_TAG="3.1-ee"
-                  export IMAGE="graviteeio/apim-portal-ui" + ":3.1-ee"
+                  IMAGE_TAG="3.1-ee"
+                  IMAGE1="graviteeio/apim-portal-ui"
+                  IMAGE="$IMAGE1$IMAGE_TAG"
                   echo $IMAGE
                   echo $IMAGE_TAG"                  
             - docker-scan
