@@ -1,6 +1,12 @@
 version: 2.1
 orbs:
     snyk: snyk/snyk@1.1.2
+parameters:
+    version:
+      type: string
+      description: version of the database to test
+      default: "xyz"   
+
 commands:
     docker-scan:
         steps:
@@ -14,11 +20,6 @@ commands:
                
 jobs:
     publish_prod_docker_images:
-        parameters:
-            version:
-                type: string
-                description: version of the database to test
-                default: "test12"    
         docker:
             - image: cimg/base:stable
         steps:
@@ -32,7 +33,6 @@ jobs:
                   export IMAGE="$IMAGE1$IMAGE_TAG"
                   echo "export IMAGE=$IMAGE" >> $BASH_ENV
                   echo "export IMAGE_TAG=$IMAGE_TAG" >> $BASH_ENV
-                  << parameters.version >>="test"
                   echo << parameters.version >>
             - when:
                   condition:
@@ -44,5 +44,5 @@ workflows:
     pull_requests:
         jobs:
             - publish_prod_docker_images:
-                 version: "test-sakthi"
+                 version: "test"
            
