@@ -5,6 +5,7 @@ commands:
     docker-scan:
         steps:
             - run:
+                name: Update image names
                 command: |
                   export IMAGE="$IMAGE1:$IMAGE_TAG"
                   echo "export IMAGE=$IMAGE" >> $BASH_ENV
@@ -28,6 +29,7 @@ jobs:
             - setup_remote_docker
             - checkout
             - run:
+                name: Update image tags
                 command: |
                   export IMAGE_TAG="3.1-ee"
                   export IMAGE1="graviteeio/apim-portal-ui"
