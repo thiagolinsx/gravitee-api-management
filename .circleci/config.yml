@@ -3,19 +3,23 @@ orbs:
     snyk: snyk/snyk@1.1.2
 commands:
     docker-scan:
+        parameters:
+            docker-image-name:
+                type: string
+                default: ""
+                description: The name of the docker image to scan (without the version)
+            version:
+                  type: string
+                  default: ""
+                  description: Version of the docker image to scan    
         steps:
-            - run:
-                name: Update image names
-                command: |
-                  export IMAGE="$IMAGE1:$IMAGE_TAG"
-                  echo "export IMAGE=$IMAGE" >> $BASH_ENV
             - snyk/scan:
                 organization: gravitee.io
                 monitor-on-build: true
                 severity-threshold: critical
-                docker-image-name: ${IMAGE}
+                docker-image-name: << parameters.docker-image-name >>:<< parameters.version >>
                 fail-on-issues: false
-                project: ${IMAGE_TAG}
+                project: << parameters.version >>
         
 jobs:
     publish_prod_docker_images:
@@ -23,23 +27,28 @@ jobs:
             dry_run:
               type: boolean
               default: true
+            enterprise_edition:
+                default: false
+                type: boolean
+            graviteeio_version:
+                default: ""
+                type: string              
         docker:
             - image: cimg/base:stable
         steps:
-            - setup_remote_docker
-            - checkout
             - run:
-                name: Update image tags
-                command: |
-                  export IMAGE_TAG="3.1-ee"
-                  export IMAGE1="graviteeio/apim-portal-ui"
-                  echo "export IMAGE_TAG=$IMAGE_TAG" >> $BASH_ENV
-                  echo "export IMAGE1=$IMAGE1" >> $BASH_ENV
+                 name: Assign image tag
+                 command: |
+                    graviteeio_version: 3.15-ee
+                    enterprise_edition: false
             - when:
                   condition:
                       equal: [false, << parameters.dry_run >>]
                   steps:
-                      - docker-scan
+                      - docker-scan:
+                            docker-image-name: graviteeio/apim-management-api
+                            version: << parameters.graviteeio_version >><<# parameters.enterprise_edition >>-ee<</ parameters.enterprise_edition >>
+                            echo << parameters.version >>
 
 workflows:
     pull_requests:
