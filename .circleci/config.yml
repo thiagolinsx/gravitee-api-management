@@ -50,4 +50,6 @@ workflows:
         jobs:
             - publish_prod_docker_images:
                  dry_run: false
+                 graviteeio_version: "3"
+                 enterprise_edition: true
            
