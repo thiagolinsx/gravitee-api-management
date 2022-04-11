@@ -28,7 +28,7 @@ jobs:
               type: boolean
               default: true
             enterprise_edition:
-                default: true
+                default: false
                 type: boolean
             graviteeio_version:
                 default: "3.15-ee"
