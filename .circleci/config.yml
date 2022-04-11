@@ -31,13 +31,11 @@ jobs:
                 default: false
                 type: boolean
             graviteeio_version:
-                default: ""
+                default: "3.15-ee"
                 type: string              
         docker:
             - image: cimg/base:stable
         steps:
-            graviteeio_version: 3.15-ee
-            enterprise_edition: false
             - when:
                   condition:
                       equal: [false, << parameters.dry_run >>]
