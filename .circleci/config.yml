@@ -36,11 +36,8 @@ jobs:
         docker:
             - image: cimg/base:stable
         steps:
-            - run:
-                 name: Assign image tag
-                 command: |
-                    graviteeio_version: 3.15-ee
-                    enterprise_edition: false
+            graviteeio_version: 3.15-ee
+            enterprise_edition: false
             - when:
                   condition:
                       equal: [false, << parameters.dry_run >>]
