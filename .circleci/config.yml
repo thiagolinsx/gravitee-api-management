@@ -17,9 +17,9 @@ commands:
                 organization: gravitee.io
                 monitor-on-build: true
                 severity-threshold: high
-                docker-image-name: << parameters.docker-image-name >>:<< parameters.version >>:/opt/<< parameters.docker-image-name >>/lib
+                docker-image-name: '<< parameters.docker-image-name >>:<< parameters.version >>'
                 fail-on-issues: false
-                project: << parameters.version >>:/opt/<< parameters.docker-image-name >>/lib
+                project: << parameters.docker-image-name >>
         
 jobs:
     publish_prod_docker_images:
