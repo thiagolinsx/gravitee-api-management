@@ -16,7 +16,7 @@ commands:
             - snyk/scan:
                 organization: gravitee.io
                 monitor-on-build: true
-                severity-threshold: critical
+                severity-threshold: high
                 docker-image-name: << parameters.docker-image-name >>:<< parameters.version >>
                 fail-on-issues: false
                 project: << parameters.version >>
