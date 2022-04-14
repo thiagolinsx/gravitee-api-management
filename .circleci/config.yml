@@ -19,7 +19,7 @@ commands:
                 severity-threshold: high
                 docker-image-name: << parameters.docker-image-name >>:<< parameters.version >>
                 fail-on-issues: false
-                project: '${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}-app'
+                project: '${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}-container'
         
 jobs:
     build: # runs not using Workflows must have a `build` job as entry point
