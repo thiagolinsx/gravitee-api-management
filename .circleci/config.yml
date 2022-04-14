@@ -17,11 +17,33 @@ commands:
                 organization: gravitee.io
                 monitor-on-build: true
                 severity-threshold: high
-                docker-image-name: '<< parameters.docker-image-name >>:<< parameters.version >>'
+                docker-image-name: << parameters.docker-image-name >>:<< parameters.version >>
                 fail-on-issues: false
-                project: << parameters.docker-image-name >>
+                project: << parameters.version >>
         
 jobs:
+  build: # runs not using Workflows must have a `build` job as entry point
+    working_directory: ~/goof # directory where steps will run
+    docker: # run the steps with Docker
+      - image: circleci/node # ...with this image as the primary container; this is where all `steps` will run
+    steps: # a collection of executable commands
+      - checkout # special step to check out source code to working directory
+      - run:
+          name: update-npm
+          command: 'sudo npm install -g npm@latest'
+      - run:
+          name: install-snyk
+          command: 'sudo npm install -g snyk'     
+      - run: # run snyk help - test snyk is installed and working
+          name: snyk-help
+          command: snyk --help
+      - run: # run snyk auth - authenticate snyk use environment variables to add token
+          name: snyk auth
+          command: snyk auth $SNYK_TOKEN
+      - run: # run snyk test - run snyk test
+          name: snyk test
+          command: snyk test
+
     publish_prod_docker_images:
         parameters:
             dry_run:
