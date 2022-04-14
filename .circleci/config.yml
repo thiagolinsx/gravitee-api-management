@@ -42,7 +42,7 @@ jobs:
               command: snyk auth $SNYK_TOKEN
           - run: # run snyk test - run snyk test
               name: snyk test
-              command: snyk container graviteeio/apim-management-api:3-ee
+              command: snyk container test graviteeio/apim-management-api:3-ee
 
     publish_prod_docker_images:
         parameters:
