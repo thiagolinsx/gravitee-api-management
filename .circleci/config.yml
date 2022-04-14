@@ -70,7 +70,7 @@ jobs:
 workflows:
     pull_requests:
         jobs:
-            #- build
+            - build
             - publish_prod_docker_images:
                  dry_run: false
                  graviteeio_version: "3"
