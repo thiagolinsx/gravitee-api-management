@@ -19,7 +19,7 @@ commands:
                 severity-threshold: high
                 docker-image-name: << parameters.docker-image-name >>:<< parameters.version >>
                 fail-on-issues: false
-                project: << parameters.version >>
+                project: '${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}-app'
         
 jobs:
     build: # runs not using Workflows must have a `build` job as entry point
@@ -70,7 +70,7 @@ jobs:
 workflows:
     pull_requests:
         jobs:
-            - build
+            #- build
             - publish_prod_docker_images:
                  dry_run: false
                  graviteeio_version: "3"
