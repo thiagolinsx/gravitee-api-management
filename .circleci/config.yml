@@ -92,6 +92,6 @@ workflows:
             #- build
             - publish_prod_docker_images:
                  dry_run: false
-                 graviteeio_version: "3.15-ee"
+                 graviteeio_version: "3.15"
                  enterprise_edition: true
            
