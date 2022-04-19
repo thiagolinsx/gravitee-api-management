@@ -43,7 +43,7 @@ jobs:
           - run: # run snyk test - run snyk test
               name: snyk test
               command: |
-                snyk config set disableSuggestions=true
+                #snyk config set disableSuggestions=true
                 #snyk container test graviteeio/apim-management-api:3-ee -d --app-vulns
                 snyk container monitor graviteeio/apim-management-api:3-ee --app-vulns
 
