@@ -44,7 +44,7 @@ jobs:
               name: snyk test
               command: |
                 snyk config set disableSuggestions=true
-                snyk container monitor graviteeio/apim-management-api:3-ee --app-vulns --project-name=graviteeio/apim-management-api:3-ee --severity-threshold=critical
+                snyk container monitor graviteeio/apim-management-api:3-ee --app-vulns --project-name=3-ee --severity-threshold=low
                 #snyk container test graviteeio/apim-management-api:3-ee --app-vulns
 
 
