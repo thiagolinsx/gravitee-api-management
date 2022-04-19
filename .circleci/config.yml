@@ -9,9 +9,9 @@ commands:
                 default: ""
                 description: The name of the docker image to scan (without the version)
             version:
-                  type: string
-                  default: ""
-                  description: Version of the docker image to scan    
+                type: string
+                default: ""
+                description: Version of the docker image to scan    
         steps:
           - run:
               name: install-snyk
@@ -66,8 +66,8 @@ jobs:
     publish_prod_docker_images:
         parameters:
             dry_run:
-              type: boolean
-              default: true
+                type: boolean
+                default: true
             enterprise_edition:
                 default: false
                 type: boolean
