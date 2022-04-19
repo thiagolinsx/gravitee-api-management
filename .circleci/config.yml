@@ -93,5 +93,5 @@ workflows:
             - publish_prod_docker_images:
                  dry_run: false
                  graviteeio_version: "3.15"
-                 enterprise_edition: true
+                 enterprise_edition: false
            
