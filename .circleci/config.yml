@@ -85,13 +85,16 @@ jobs:
                             docker-image-name: graviteeio/apim-management-api
                             version: << parameters.graviteeio_version >><<# parameters.enterprise_edition >>-ee<</ parameters.enterprise_edition >>
                             #echo << parameters.version >>
-
+        steps:
+            - run:
+                name: test
+                command: echo << parameters.version >>               
 workflows:
     pull_requests:
         jobs:
             #- build
             - publish_prod_docker_images:
-                 dry_run: false
+                 dry_run: true
                  graviteeio_version: "3.15"
                  enterprise_edition: true
            
