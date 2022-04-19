@@ -74,8 +74,8 @@ jobs:
 workflows:
     pull_requests:
         jobs:
-            #- build
-            - publish_prod_docker_images:
+            - build
+            #- publish_prod_docker_images:
                  dry_run: false
                  graviteeio_version: "3"
                  enterprise_edition: true
