@@ -44,7 +44,7 @@ jobs:
               name: snyk test
               command: |
                 snyk config set disableSuggestions=true
-                snyk container monitor graviteeio/apim-management-api:3.17.1-ee --app-vulns -d
+                snyk container monitor graviteeio/apim-management-api:3.17.1-ee --project-name=3.17.1-ee --app-vulns -d
                 #snyk container test graviteeio/apim-management-api:3-ee --app-vulns
 
 
