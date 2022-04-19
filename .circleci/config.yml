@@ -75,7 +75,7 @@ jobs:
                 default: "3"
                 type: string              
         docker:
-            - image: cimg/base:stable
+            - image: circleci/node
         steps:
             - when:
                   condition:
