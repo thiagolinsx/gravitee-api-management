@@ -13,13 +13,28 @@ commands:
                   default: ""
                   description: Version of the docker image to scan    
         steps:
-            - snyk/scan:
-                organization: gravitee.io
-                monitor-on-build: true
-                severity-threshold: high
-                docker-image-name: << parameters.docker-image-name >>:<< parameters.version >>
-                fail-on-issues: false
-                project: '${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}-container'
+          - run:
+              name: install-snyk
+              command: 'sudo npm install -g snyk'     
+          - run: # run snyk help - test snyk is installed and working
+              name: snyk-help
+              command: snyk --help
+          - run: # run snyk auth - authenticate snyk use environment variables to add token
+              name: snyk auth
+              command: snyk auth $SNYK_TOKEN
+          - run: # run snyk test - run snyk test
+              name: snyk test
+              command: |
+                snyk config set disableSuggestions=true
+                snyk container monitor << parameters.docker-image-name >>:<< parameters.version >> --project-name=<< parameters.version >> --app-vulns -d
+                #snyk container test graviteeio/apim-management-api:3-ee --app-vulns        
+           # - snyk/scan:
+           #     organization: gravitee.io
+           #     monitor-on-build: true
+           #     severity-threshold: high
+           #     docker-image-name: << parameters.docker-image-name >>:<< parameters.version >>
+           #     fail-on-issues: false
+           #     project: '${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}-container'
         
 jobs:
     build: # runs not using Workflows must have a `build` job as entry point
@@ -44,7 +59,7 @@ jobs:
               name: snyk test
               command: |
                 snyk config set disableSuggestions=true
-                snyk container monitor graviteeio/apim-management-api:3.17.1-ee --project-name=3.17.1-ee --app-vulns -d
+                snyk container monitor << parameters.docker-image-name >>:<< parameters.version >> --project-name=<< parameters.version >> --app-vulns -d
                 #snyk container test graviteeio/apim-management-api:3-ee --app-vulns
 
 
@@ -57,7 +72,7 @@ jobs:
                 default: false
                 type: boolean
             graviteeio_version:
-                default: "3.15-ee"
+                default: "3"
                 type: string              
         docker:
             - image: cimg/base:stable
@@ -74,9 +89,9 @@ jobs:
 workflows:
     pull_requests:
         jobs:
-            - build
-            #- publish_prod_docker_images:
-            #     dry_run: false
-            #     graviteeio_version: "3"
-            #     enterprise_edition: true
+            #- build
+            - publish_prod_docker_images:
+                 dry_run: false
+                 graviteeio_version: "3.15-ee"
+                 enterprise_edition: true
            
