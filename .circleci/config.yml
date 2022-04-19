@@ -45,7 +45,7 @@ jobs:
               command: |
                 snyk config set disableSuggestions=true
                 #snyk container test graviteeio/apim-management-api:3-ee -d --app-vulns
-                snyk container monitor graviteeio/apim-management-api:3-ee -d --app-vulns
+                snyk container monitor graviteeio/apim-management-api:3-ee --app-vulns
 
     publish_prod_docker_images:
         parameters:
@@ -74,8 +74,8 @@ workflows:
     pull_requests:
         jobs:
             - build
-            - publish_prod_docker_images:
-                 dry_run: false
-                 graviteeio_version: "3"
-                 enterprise_edition: true
+            #- publish_prod_docker_images:
+            #     dry_run: false
+            #     graviteeio_version: "3"
+            #     enterprise_edition: true
            
