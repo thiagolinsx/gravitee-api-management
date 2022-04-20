@@ -51,7 +51,6 @@ commands:
                 default: "3"
                 type: string              
         docker:
-            #- image: circleci/node
             - image: cimg/base:stable
         steps:
             - when:
