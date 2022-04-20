@@ -15,7 +15,9 @@ commands:
         steps:
           - run:
               name: install-snyk
-              command: 'sudo npm install -g snyk'     
+              command: | 
+                'sudo apt install nodejs'
+                'sudo npm install snyk -g'
           - run: # run snyk help - test snyk is installed and working
               name: snyk-help
               command: snyk --help
@@ -36,33 +38,6 @@ commands:
            #     fail-on-issues: false
            #     project: '${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}-container'
         
-jobs:
-    build: # runs not using Workflows must have a `build` job as entry point
-        working_directory: ~/goof # directory where steps will run
-        docker: # run the steps with Docker
-          - image: circleci/node # ...with this image as the primary container; this is where all `steps` will run
-        steps: # a collection of executable commands
-          #- checkout # special step to check out source code to working directory
-          #- run:
-          #    name: update-npm
-          #    command: 'sudo npm install -g npm@latest'
-          - run:
-              name: install-snyk
-              command: 'sudo npm install -g snyk'     
-          - run: # run snyk help - test snyk is installed and working
-              name: snyk-help
-              command: snyk --help
-          - run: # run snyk auth - authenticate snyk use environment variables to add token
-              name: snyk auth
-              command: snyk auth $SNYK_TOKEN
-          - run: # run snyk test - run snyk test
-              name: snyk test
-              command: |
-                snyk config set disableSuggestions=true
-                snyk container monitor << parameters.docker-image-name >>:<< parameters.version >> --project-name=<< parameters.version >> --app-vulns -d
-                #snyk container test graviteeio/apim-management-api:3-ee --app-vulns
-
-
     publish_prod_docker_images:
         parameters:
             dry_run:
@@ -75,7 +50,8 @@ jobs:
                 default: "3"
                 type: string              
         docker:
-            - image: circleci/node
+            #- image: circleci/node
+            - image: cimg/base:stable
         steps:
             - when:
                   condition:
@@ -88,15 +64,10 @@ jobs:
             - run:
                 name: test
                 command: echo "teewtsdgsd"
-                
-        #steps:
-        #    - run:
-        #        name: test
-        #        command: echo "sgsdg"               
+             
 workflows:
     pull_requests:
         jobs:
-            #- build
             - publish_prod_docker_images:
                  dry_run: true
                  graviteeio_version: "3.15"
