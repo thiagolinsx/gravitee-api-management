@@ -16,8 +16,8 @@ commands:
           - run:
               name: install-snyk
               command: | 
-                'sudo apt install nodejs'
-                'sudo npm install snyk -g'
+                sudo apt install nodejs
+                sudo npm install snyk -g
           - run: # run snyk help - test snyk is installed and working
               name: snyk-help
               command: snyk --help
