@@ -14,6 +14,9 @@ commands:
                 description: Version of the docker image to scan    
         steps:
           - run:
+              name: install-nodesource
+              command: curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -        
+          - run:
               name: install-nodejs
               command: sudo apt install nodejs
           - run:
