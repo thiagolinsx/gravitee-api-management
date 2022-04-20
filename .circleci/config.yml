@@ -31,16 +31,7 @@ commands:
           - run: # run snyk test - run snyk test
               name: snyk test
               command: |
-                snyk config set disableSuggestions=true
                 snyk container monitor << parameters.docker-image-name >>:<< parameters.version >> --project-name=<< parameters.version >> --app-vulns -d
-                #snyk container test graviteeio/apim-management-api:3-ee --app-vulns        
-           # - snyk/scan:
-           #     organization: gravitee.io
-           #     monitor-on-build: true
-           #     severity-threshold: high
-           #     docker-image-name: << parameters.docker-image-name >>:<< parameters.version >>
-           #     fail-on-issues: false
-           #     project: '${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}-container'
 jobs:       
     publish_prod_docker_images:
         parameters:
