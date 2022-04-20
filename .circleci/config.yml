@@ -27,6 +27,10 @@ commands:
               command: |
                 snyk config set disableSuggestions=true
                 snyk container test << parameters.docker-image-name >>:<< parameters.version >> --app-vulns -d
+                SLACK_MESSAGE=<< parameters.docker-image-name >>:<< parameters.version >>
+                echo ${SLACK_MESSAGE}
+                echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV
+                
     notify-snyk-result:
       steps:
           - slack/notify:
@@ -80,21 +84,6 @@ jobs:
                       - docker-scan:
                             docker-image-name: graviteeio/apim-management-api
                             version: << parameters.graviteeio_version >><<# parameters.enterprise_edition >>-ee<</ parameters.enterprise_edition >>
-                            #echo << parameters.version >>
-            - run:
-                when: always
-                name: Generate last log lines for slack message
-                command: |
-                  API_URL=$(echo $CIRCLE_BUILD_URL | cut -d/ -f4-7)
-                  FAILED_STEP=$(curl "https://circleci.com/api/v1.1/project/${API_URL}?circle-token=${CIRCLE_API_TOKEN}" | jq '.steps | .[] | flatten | map(select(.name? == "snyk container monitor")) | .[] | {allocation_id, step}')
-                  ALLOCATION_ID=$(echo "${FAILED_STEP}" | jq -r '.allocation_id')
-                  STEP=$(echo "${FAILED_STEP}" | jq -r '.step')
-                  curl -o slack_response.txt "https://circleci.com/api/v1.1/project/${API_URL}/output/${STEP}/0?file=true&allocation-id=${ALLOCATION_ID}&circle-token=$CIRCLE_API_TOKEN"
-                  sed -i 's/\r$//g' slack_response.txt
-                  SLACK_MESSAGE=$(cat slack_response.txt | tail -n 1 | sed '$!s/$/\\n/' | tr -d '\n')
-                  SLACK_MESSAGE="Image scanned and found vulnerabilities"
-                  echo ${SLACK_MESSAGE}
-                  echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV
             - notify-snyk-result     
 workflows:
     pull_requests:
