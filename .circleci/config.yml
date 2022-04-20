@@ -15,10 +15,10 @@ commands:
         steps:
           - run:
               name: install-nodejs
-              command: 'sudo apt install nodejs'
+              command: sudo apt install nodejs
           - run:
               name: install-snyk
-              command: 'sudo npm install snyk -g'                           
+              command: sudo npm install snyk -g                          
           - run: # run snyk help - test snyk is installed and working
               name: snyk-help
               command: snyk --help
