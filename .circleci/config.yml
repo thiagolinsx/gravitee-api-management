@@ -15,8 +15,7 @@ commands:
         steps:
           - run:
               name: install-nodesource-nodejs-snyk
-              command: |
-                sudo apt update        
+              command: |     
                 sudo apt install nodejs npm
                 sudo npm install snyk -g                          
                 snyk --help
