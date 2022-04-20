@@ -31,6 +31,7 @@ commands:
                 echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV              
                 snyk config set disableSuggestions=true
                 snyk container test << parameters.docker-image-name >>:<< parameters.version >> --app-vulns -d
+                SLACK_MESSAGE="${SLACK_MESSAGE1} image has been Tested for vulnerability using snyk and no vulnerable paths found"
                
     notify-snyk-result:
       steps:
@@ -59,7 +60,7 @@ commands:
                       }
                     ]
                   }
-                event: fail
+                event: always
 
 
 jobs:       
@@ -83,7 +84,7 @@ jobs:
                       equal: [false, << parameters.dry_run >>]
                   steps:
                       - docker-scan:
-                            docker-image-name: graviteeio/apim-management-api
+                            docker-image-name: graviteeio/apim-management-ui
                             version: << parameters.graviteeio_version >><<# parameters.enterprise_edition >>-ee<</ parameters.enterprise_edition >>
             - notify-snyk-result     
 workflows:
@@ -91,6 +92,6 @@ workflows:
         jobs:
             - publish_prod_docker_images:
                  dry_run: false
-                 graviteeio_version: "3.15"
+                 graviteeio_version: "3.17.1"
                  enterprise_edition: true
            
