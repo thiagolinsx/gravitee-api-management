@@ -16,7 +16,8 @@ commands:
           - run:
               name: install-nodesource-nodejs-snyk
               command: |     
-                sudo apt install nodejs npm
+                curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+                sudo apt install nodejs
                 sudo npm install snyk -g                          
                 snyk --help
                 snyk auth $SNYK_TOKEN
