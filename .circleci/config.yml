@@ -25,7 +25,8 @@ commands:
           - run: # run snyk container monitor
               name: snyk container monitor
               command: |
-                SLACK_MESSAGE=<< parameters.docker-image-name >>:<< parameters.version >> - Tested for vulnerability using snyk and found issues
+                SLACK_MESSAGE1=<< parameters.docker-image-name >>:<< parameters.version >>
+                SLACK_MESSAGE="${SLACK_MESSAGE1}- Tested for vulnerability using snyk and found issues"
                 echo ${SLACK_MESSAGE}
                 echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV              
                 snyk config set disableSuggestions=true
