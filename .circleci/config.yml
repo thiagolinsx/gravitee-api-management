@@ -53,7 +53,7 @@ commands:
                       }
                     ]
                   }
-                event: always   
+                event: pass   
 
 
 jobs:       
