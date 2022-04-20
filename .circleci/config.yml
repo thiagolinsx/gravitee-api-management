@@ -62,15 +62,12 @@ commands:
                             docker-image-name: graviteeio/apim-management-api
                             version: << parameters.graviteeio_version >><<# parameters.enterprise_edition >>-ee<</ parameters.enterprise_edition >>
                             #echo << parameters.version >>
-            - run:
-                name: test
-                command: echo "teewtsdgsd"
-             
+            
 workflows:
     pull_requests:
         jobs:
             - publish_prod_docker_images:
-                 dry_run: true
+                 dry_run: false
                  graviteeio_version: "3.15"
                  enterprise_edition: true
            
