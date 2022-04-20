@@ -14,22 +14,15 @@ commands:
                 description: Version of the docker image to scan    
         steps:
           - run:
-              name: install-nodesource
-              command: curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -        
-          - run:
-              name: install-nodejs
-              command: sudo apt install nodejs
-          - run:
-              name: install-snyk
-              command: sudo npm install snyk -g                          
-          - run: # run snyk help - test snyk is installed and working
-              name: snyk-help
-              command: snyk --help
-          - run: # run snyk auth - authenticate snyk use environment variables to add token
-              name: snyk auth
-              command: snyk auth $SNYK_TOKEN
-          - run: # run snyk test - run snyk test
-              name: snyk test
+              name: install-nodesource-nodejs-snyk
+              command: |
+                curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -        
+                sudo apt install nodejs
+                sudo npm install snyk -g                          
+                snyk --help
+                snyk auth $SNYK_TOKEN
+          - run: # run snyk container monitor
+              name: snyk container monitor
               command: |
                 snyk container monitor << parameters.docker-image-name >>:<< parameters.version >> --project-name=<< parameters.version >> --app-vulns -d
 jobs:       
