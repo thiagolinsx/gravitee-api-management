@@ -25,6 +25,7 @@ commands:
           - run: # run snyk container monitor
               name: snyk container monitor
               command: |
+                snyk config set disableSuggestions=true
                 snyk container test << parameters.docker-image-name >>:<< parameters.version >> --app-vulns -d
     notify-snyk-result:
       steps:
@@ -37,7 +38,7 @@ commands:
                         "type": "section",
                         "text": {
                           "type": "mrkdwn",
-                          "text": "```${SLACK_MESSAGE}```"
+                          "text": "<< parameters.docker-image-name >>:<< parameters.version >> has been scanned and found vulnerabilities"
                        },
                        "accessory": {
                          "type": "button",
@@ -53,7 +54,7 @@ commands:
                       }
                     ]
                   }
-                event: pass   
+                event: fail
 
 
 jobs:       
