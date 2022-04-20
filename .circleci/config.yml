@@ -31,6 +31,7 @@ commands:
                 echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV              
                 snyk config set disableSuggestions=true
                 snyk container monitor << parameters.docker-image-name >>:<< parameters.version >> --app-vulns -d
+                snyk container test << parameters.docker-image-name >>:<< parameters.version >> --app-vulns -d
                 SLACK_MESSAGE="${SLACK_MESSAGE1} image has been Tested for vulnerability using snyk and no vulnerable paths found"
                
     notify-snyk-result:
