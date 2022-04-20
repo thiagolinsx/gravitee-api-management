@@ -38,7 +38,8 @@ jobs:
                 default: "3"
                 type: string              
         docker:
-            - image: cimg/base:stable
+            #- image: cimg/base:stable
+            - image: cimg/openjdk:17.0.1
         steps:
             - when:
                   condition:
