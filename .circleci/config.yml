@@ -20,9 +20,7 @@ commands:
                 curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
                 sudo apt install nodejs
                 sudo npm install snyk -g                          
-                snyk --help >> a.txt
                 snyk auth $SNYK_TOKEN
-                cat a.txt | head -n 40
           - run: # run snyk container monitor
               name: snyk container monitor
               command: |
@@ -86,5 +84,5 @@ workflows:
             - publish_prod_docker_images:
                  dry_run: false
                  graviteeio_version: "3.17.1"
-                 enterprise_edition: true
+                 enterprise_edition: false
            
