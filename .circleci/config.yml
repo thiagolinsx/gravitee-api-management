@@ -76,7 +76,7 @@ jobs:
                       equal: [false, << parameters.dry_run >>]
                   steps:
                       - docker-scan:
-                            docker-image-name: graviteeio/apim-management-ui
+                            docker-image-name: graviteeio/apim-management-api
                             version: << parameters.graviteeio_version >><<# parameters.enterprise_edition >>-ee<</ parameters.enterprise_edition >> 
 workflows:
     pull_requests:
