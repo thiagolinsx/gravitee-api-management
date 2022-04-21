@@ -24,7 +24,7 @@ commands:
           - run: # run snyk container monitor
               name: snyk container monitor
               command: |
-                snyk container monitor << parameters.docker-image-name >>:<< parameters.version >> --app-vulns -d
+                snyk container monitor << parameters.docker-image-name >>:<< parameters.version >> --project-name=<< parameters.version >> --app-vulns -d
                
     notify-snyk-result:
       steps:
