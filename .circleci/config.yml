@@ -13,25 +13,18 @@ commands:
                 type: string
                 default: ""
                 description: Version of the docker image to scan    
-        steps:
-           - snyk/scan:
-               organization: gravitee.io
-               monitor-on-build: false
-               severity-threshold: high
-               docker-image-name: << parameters.docker-image-name >>:<< parameters.version >>
-               fail-on-issues: false
-               app-vulns: true        
-          #- run:
-          #    name: install-nodesource-nodejs-snyk
-          #    command: |     
-          #      curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-          #      sudo apt install nodejs
-          #      sudo npm install snyk -g                          
-          #      snyk auth $SNYK_TOKEN
-          #- run: # run snyk container monitor
-          #    name: snyk container monitor
-          #    command: |
-          #      snyk container monitor << parameters.docker-image-name >>:<< parameters.version >> --project-name=<< parameters.version >> --app-vulns -d
+        steps:     
+          - run:
+              name: install-nodesource-nodejs-snyk
+              command: |     
+                curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+                sudo apt install nodejs
+                sudo npm install snyk -g                          
+                snyk auth $SNYK_TOKEN
+          - run: # run snyk container monitor
+              name: snyk container monitor
+              command: |
+                snyk container test graviteeio.azurecr.io/am-gateway:3-15-x-b94852f-1650383714 --app-vulns -d
                
     notify-snyk-result:
       steps:
