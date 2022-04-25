@@ -1,31 +1,7 @@
 version: 2.1
 orbs:
-    snyk: snyk/snyk@1.1.2
     slack: circleci/slack@4.8.1
-commands:
-    docker-scan:
-        parameters:
-            docker-image-name:
-                type: string
-                default: ""
-                description: The name of the docker image to scan (without the version)
-            version:
-                type: string
-                default: ""
-                description: Version of the docker image to scan    
-        steps:     
-          - run:
-              name: install-nodesource-nodejs-snyk
-              command: |     
-                curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-                sudo apt install nodejs
-                sudo npm install snyk -g                          
-                snyk auth $SNYK_TOKEN
-          - run: # run snyk container monitor
-              name: snyk container monitor
-              command: |
-                snyk container test graviteeio.azurecr.io/am-gateway:3-15-x-b94852f-1650383714 --app-vulns -d
-               
+commands:            
     notify-snyk-result:
       steps:
           - slack/notify:
@@ -56,40 +32,26 @@ commands:
                 event: always
 
 jobs:       
-    publish_prod_docker_images:
-        parameters:
-            dry_run:
-                type: boolean
-                default: true
-            enterprise_edition:
-                default: false
-                type: boolean
-            graviteeio_version:
-                default: "3"
-                type: string              
+    publish_prod_docker_images:          
         docker:
             #- image: cimg/base:stable
-            - image: cimg/openjdk:17.0.1
-            
+            - image: cimg/openjdk:17.0.1    
         steps:
-            - when:
-                  condition:
-                      equal: [false, << parameters.dry_run >>]
-                      
-                  steps:
-                      - docker-scan:
-                            docker-image-name: graviteeio/apim-management-api
-                            version: << parameters.graviteeio_version >><<# parameters.enterprise_edition >>-ee<</ parameters.enterprise_edition >>
             - run:
-                command: |
+                name: snyk scan
+                command: |     
+                  curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+                  sudo apt install nodejs
+                  sudo npm install snyk -g                          
+                  snyk auth $SNYK_TOKEN
                   SLACK_MESSAGE="test image name"
+                  echo $SLACK_MESSAGE
                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV  
+                  snyk container test graviteeio.azurecr.io/am-gateway:3-15-x-b94852f-1650383714 --app-vulns -d
             - notify-snyk-result
 workflows:
     pull_requests:
         jobs:
             - publish_prod_docker_images:
-                 dry_run: false
-                 graviteeio_version: "3.16.1"
-                 enterprise_edition: true
+
            
