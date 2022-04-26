@@ -7,7 +7,7 @@ commands:
       steps:
           - snyk/scan:
               organization: gravitee.io
-              monitor-on-build: false
+              monitor-on-build: true
               severity-threshold: critical
               docker-image-name: ${IMAGE_TAG}
               fail-on-issues: false  
