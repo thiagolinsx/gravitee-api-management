@@ -62,7 +62,8 @@ jobs:
                 name: snyk scan 3  
                 when: always
                 command: |
-                  SLACK_MESSAGE="test image name 2"            
+                  SLACK_MESSAGE="test image name 2" 
+                  exit 0
             
     publish_prod_docker_images1:          
         docker:
