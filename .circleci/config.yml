@@ -1,7 +1,17 @@
 version: 2.1
 orbs:
     slack: circleci/slack@4.8.1
-commands:            
+    snyk: snyk/snyk@1.1.2
+commands:  
+    docker-scan:
+      steps:
+          - snyk/scan:
+              organization: gravitee.io
+              monitor-on-build: false
+              severity-threshold: critical
+              docker-image-name: ${IMAGE_TAG}
+              fail-on-issues: false  
+              additional-arguments: --app-vulns
     notify-snyk-result:
       steps:
           - slack/notify:
@@ -64,8 +74,11 @@ jobs:
                   SLACK_MESSAGE5="Visit Snyk Console https://app.snyk.io/org/gravitee.io/projects for detail result"
                   SLACK_MESSAGE="${SLACK_MESSAGE4}\n${SLACK_MESSAGE6}\n${SLACK_MESSAGE1}\n${SLACK_MESSAGE2}\n${SLACK_MESSAGE3}\n\n${SLACK_MESSAGE5}"
                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV 
+                  IMAGE_TAG=graviteeio/apim-management-ui:3.10.14
+                  echo "export IMAGE_TAG='${IMAGE_TAG}'" >> $BASH_ENV 
                   #exit 0
             - notify-snyk-result  
+            - docker-scan
             - run:
                 name: snyk scan 3  
                 when: always
@@ -88,10 +101,10 @@ workflows:
     pull_requests:
         jobs:
             - publish_prod_docker_images
-            - publish_prod_docker_images1:
-                name: test
-                requires:
-                  - publish_prod_docker_images
+            #- publish_prod_docker_images1:
+            #    name: test
+            #    requires:
+            #      - publish_prod_docker_images
             
 
            
