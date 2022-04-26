@@ -60,8 +60,9 @@ jobs:
                   echo "export SLACK_MESSAGE2='${SLACK_MESSAGE2}'" >> $BASH_ENV  
                   #snyk container monitor graviteeio/apim-management-ui:3.10.14 --app-vulns -d
                   SLACK_MESSAGE4="-----AM Docker Images Snyk Scan-----"
+                  SLACK_MESSAGE6="Following images are scanned using snyk cli for docker image and application vulnerability"
                   SLACK_MESSAGE5="Visit Snyk Console https://app.snyk.io/org/gravitee.io/projects for detail result"
-                  SLACK_MESSAGE="${SLACK_MESSAGE4}\n${SLACK_MESSAGE1}\n${SLACK_MESSAGE2}\n${SLACK_MESSAGE3}\n${SLACK_MESSAGE5}"
+                  SLACK_MESSAGE="${SLACK_MESSAGE4}\n${SLACK_MESSAGE6}\n${SLACK_MESSAGE1}\n${SLACK_MESSAGE2}\n${SLACK_MESSAGE3}\n\n${SLACK_MESSAGE5}"
                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV 
                   #exit 0
             - notify-snyk-result  
