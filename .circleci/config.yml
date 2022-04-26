@@ -59,7 +59,8 @@ jobs:
                   snyk container test graviteeio.azurecr.io/am-gateway:3-15-x-b94852f-1650383714 --app-vulns -d
             - notify-snyk-result  
             - run:
-                name: snyk scan 3           
+                name: snyk scan 3  
+                when: always
                 command: |
                   SLACK_MESSAGE="test image name 2"            
             
