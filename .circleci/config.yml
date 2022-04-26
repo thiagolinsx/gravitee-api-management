@@ -12,6 +12,7 @@ commands:
               docker-image-name: ${IMAGE_TAG}
               fail-on-issues: false  
               additional-arguments: --app-vulns
+              project: 3.10.14
     notify-snyk-result:
       steps:
           - slack/notify:
