@@ -40,7 +40,7 @@ jobs:
             - run:
                 name: snyk scan 1
                 command: |  
-                  set -e
+                  #set -e
                   curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
                   sudo apt install nodejs
                   sudo npm install snyk -g                          
@@ -48,27 +48,27 @@ jobs:
                   SLACK_MESSAGE="test image name 1"
                   echo $SLACK_MESSAGE
                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV  
-                  snyk container test graviteeio/apim-management-ui:3.10.14 --app-vulns -d
-                  exit 0
-            - notify-snyk-result
+                  snyk container monitor graviteeio/apim-management-ui:3.10.14 --app-vulns -d
+                  #exit 0
+            #- notify-snyk-result
             - run:
                 name: snyk scan 2
                 when: always                
                 command: |
-                  set -e
+                  #set -e
                   SLACK_MESSAGE="test image name 2"
                   echo $SLACK_MESSAGE
                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV  
-                  snyk container test graviteeio/apim-management-ui:3.10.14 --app-vulns -d
-                  exit 0
-            - notify-snyk-result  
+                  snyk container monitor graviteeio/apim-management-ui:3.10.14 --app-vulns -d
+                  #exit 0
+            #- notify-snyk-result  
             - run:
                 name: snyk scan 3  
                 when: always
                 command: |
-                  set -e
+                  #set -e
                   SLACK_MESSAGE="test image name 2" 
-                  exit 0
+                  #exit 0
             
     publish_prod_docker_images1:          
         docker:
