@@ -51,6 +51,7 @@ jobs:
             - notify-snyk-result
             - run:
                 name: snyk scan 2
+                when: always                
                 command: |     
                   SLACK_MESSAGE="test image name 2"
                   echo $SLACK_MESSAGE
