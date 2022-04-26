@@ -39,7 +39,8 @@ jobs:
         steps:
             - run:
                 name: snyk scan 1
-                command: |     
+                command: |  
+                  set -e
                   curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
                   sudo apt install nodejs
                   sudo npm install snyk -g                          
@@ -52,7 +53,8 @@ jobs:
             - run:
                 name: snyk scan 2
                 when: always                
-                command: |     
+                command: |
+                  set -e
                   SLACK_MESSAGE="test image name 2"
                   echo $SLACK_MESSAGE
                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV  
@@ -75,7 +77,6 @@ workflows:
         jobs:
             - publish_prod_docker_images
             - publish_prod_docker_images1:
-                when: always
                 requires:
                   - publish_prod_docker_images
             
