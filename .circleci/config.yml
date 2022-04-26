@@ -65,7 +65,7 @@ jobs:
                 when: always
                 command: |
                   SLACK_MESSAGE="test image name 2" 
-                  exit 1
+                  exit 0
             
     publish_prod_docker_images1:          
         docker:
