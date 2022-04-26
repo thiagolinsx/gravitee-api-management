@@ -40,6 +40,7 @@ jobs:
             - run:
                 name: snyk scan 1
                 command: |  
+                  set -e
                   curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
                   sudo apt install nodejs
                   sudo npm install snyk -g                          
@@ -54,6 +55,7 @@ jobs:
                 name: snyk scan 2
                 when: always                
                 command: |
+                  set -e
                   SLACK_MESSAGE="test image name 2"
                   echo $SLACK_MESSAGE
                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV  
@@ -64,6 +66,7 @@ jobs:
                 name: snyk scan 3  
                 when: always
                 command: |
+                  set -e
                   SLACK_MESSAGE="test image name 2" 
                   exit 0
             
