@@ -47,7 +47,7 @@ jobs:
                   SLACK_MESSAGE="test image name 1"
                   echo $SLACK_MESSAGE
                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV  
-                  snyk container test graviteeio.azurecr.io/am-gateway:3-15-x-b94852f-1650383714 --app-vulns -d
+                  snyk container test graviteeio/apim-management-ui:3.10.14 --app-vulns -d
             - notify-snyk-result
             - run:
                 name: snyk scan 2
@@ -56,7 +56,7 @@ jobs:
                   SLACK_MESSAGE="test image name 2"
                   echo $SLACK_MESSAGE
                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV  
-                  snyk container test graviteeio.azurecr.io/am-gateway:3-15-x-b94852f-1650383714 --app-vulns -d
+                  snyk container test graviteeio/apim-management-ui:3.10.14 --app-vulns -d
             - notify-snyk-result  
             - run:
                 name: snyk scan 3  
