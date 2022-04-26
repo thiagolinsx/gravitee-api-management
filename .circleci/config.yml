@@ -40,7 +40,6 @@ jobs:
             - run:
                 name: snyk scan 1
                 command: |  
-                  set -e
                   curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
                   sudo apt install nodejs
                   sudo npm install snyk -g                          
@@ -48,26 +47,29 @@ jobs:
                   SLACK_MESSAGE="test image name 1"
                   echo $SLACK_MESSAGE
                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV  
-                  #snyk container test graviteeio.azurecr.io/am-gateway:3-15-x-b94852f-1650383714 --app-vulns -d
+                  snyk container test graviteeio.azurecr.io/am-gateway:3-15-x-b94852f-1650383714 --app-vulns -d
             - notify-snyk-result
             - run:
                 name: snyk scan 2
                 when: always                
                 command: |
-                  set -e
                   SLACK_MESSAGE="test image name 2"
                   echo $SLACK_MESSAGE
                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV  
-                  #snyk container test graviteeio.azurecr.io/am-gateway:3-15-x-b94852f-1650383714 --app-vulns -d
-            - notify-snyk-result                  
+                  snyk container test graviteeio.azurecr.io/am-gateway:3-15-x-b94852f-1650383714 --app-vulns -d
+            - notify-snyk-result  
+            - run:
+                name: snyk scan 3           
+                command: |
+                  SLACK_MESSAGE="test image name 2"            
+            
     publish_prod_docker_images1:          
         docker:
             #- image: cimg/base:stable
             - image: cimg/openjdk:17.0.1    
         steps:
             - run:
-                name: snyk scan 1
-                when: always
+                name: snyk scan 4
                 command: |     
                   curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
                   sudo apt install nodejs
