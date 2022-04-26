@@ -75,6 +75,7 @@ workflows:
         jobs:
             - publish_prod_docker_images
             - publish_prod_docker_images1:
+                when: always
                 requires:
                   - publish_prod_docker_images
             
