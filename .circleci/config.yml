@@ -56,7 +56,7 @@ jobs:
                   echo "export IMAGE_TAG='${IMAGE_TAG}'" >> $BASH_ENV  
             - docker-scan
             - run:
-                #when: always
+                when: always
                 name: Generate last log lines for slack message
                 command: |
                    API_URL=$(echo $CIRCLE_BUILD_URL | cut -d/ -f4-7)
