@@ -19,8 +19,8 @@ commands:
               default: ${notify1}
           steps:
             - when:
-                condition:
-                     equal: ["true", << parameters.notify >>]
+                condition: "$notify1"
+                #     equal: ["true", << parameters.notify >>]
                 steps:        
                   - slack/notify:
                       channel: 'devsecops'
