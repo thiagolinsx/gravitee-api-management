@@ -21,7 +21,7 @@ commands:
           condition:
             equal: [test, << parameters.notify >>]            
           steps:
-           - slack/notify:
+            - slack/notify:
                 #when: 
                 channel: 'devsecops'
                 custom: |
