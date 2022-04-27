@@ -56,7 +56,7 @@ jobs:
                    #notify=false
                    #fi
             - notify-snyk-result:
-                  notify: "true"
+                  notify: "true1"
                    
             #- when: 
             #      condition:
