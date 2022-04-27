@@ -50,7 +50,8 @@ jobs:
             - run:
                 name: snyk scan 1
                 command: |  
-                  IMAGE_TAG=graviteeio/am-management-api:3.10-ee            
+                  IMAGE_TAG=graviteeio/am-management-api:3.10-ee 
+                  echo "export IMAGE_TAG='${IMAGE_TAG}'" >> $BASH_ENV  
             - docker-scan
             - run:
                 when: always
