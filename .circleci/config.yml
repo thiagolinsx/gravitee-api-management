@@ -76,7 +76,7 @@ jobs:
                    fi
             - when: 
                   condition:
-                      equal: [true, <<parameters.notify >>]
+                      equal: [test, ${SLACK_MESSAGE1}]
                   steps:
                       - notify-snyk-result
 
