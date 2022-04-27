@@ -13,9 +13,14 @@ commands:
               fail-on-issues: false  
               additional-arguments: --app-vulns
     notify-snyk-result: 
+          parameters:
+            notify:
+              type: string
+              default: "false"
           steps:
             - when:
-                condition: "$notify1"
+                condition: 
+                  equal: ["true", << parameters.notify >>]
                 steps:        
                   - slack/notify:
                       channel: 'devsecops'
@@ -74,7 +79,8 @@ jobs:
                    notify1="false"
                    echo "export notify1='${notify1}'" >> $BASH_ENV
                    fi   
-            - notify-snyk-result
+            - notify-snyk-result:
+                   notify: "true"
 workflows:
     pull_requests:
         jobs:
