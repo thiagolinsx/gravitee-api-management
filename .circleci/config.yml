@@ -16,7 +16,7 @@ commands:
           parameters:
             notify:
               type: string
-              default: "false"
+              default: "echo ${notify1}"
           steps:
             - when:
                 condition:
@@ -60,7 +60,6 @@ jobs:
                   echo "export IMAGE_TAG='${IMAGE_TAG}'" >> $BASH_ENV  
             - docker-scan
             - run:
-                #when: always
                 name: Generate last log lines for slack message
                 command: |
                    API_URL=$(echo $CIRCLE_BUILD_URL | cut -d/ -f4-7)
@@ -81,16 +80,7 @@ jobs:
                    notify1="false"
                    echo "export notify1='${notify1}'" >> $BASH_ENV
                    fi
-            - notify-snyk-result:
-                  notify: "```${notify1}```"
-                   
-            #- when: 
-            #      condition:
-            #          equal: [true, << parameters.notify >>]
-            #      steps:
-            #          - notify-snyk-result
-
-                      
+            - notify-snyk-result                    
 workflows:
     pull_requests:
         jobs:
