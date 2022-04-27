@@ -16,7 +16,7 @@ commands:
           parameters:
             notify:
               type: string
-              default: "true"
+              default: ${notify1}
           steps:
             - when:
                 condition:
