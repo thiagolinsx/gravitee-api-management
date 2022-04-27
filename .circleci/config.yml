@@ -13,14 +13,9 @@ commands:
               fail-on-issues: false  
               additional-arguments: --app-vulns
     notify-snyk-result: 
-          parameters:
-            notify:
-              type: string
-              default: ${notify1}
           steps:
             - when:
                 condition: "$notify1"
-                #     equal: ["true", << parameters.notify >>]
                 steps:        
                   - slack/notify:
                       channel: 'devsecops'
@@ -69,7 +64,7 @@ jobs:
                    curl -o slack_response.txt "https://circleci.com/api/v1.1/project/${API_URL}/output/${STEP}/0?file=true&allocation-id=${ALLOCATION_ID}&circle-token=$CIRCLE_API_TOKEN"
                    sed -i 's/\r$//g' slack_response.txt
                    SLACK_MESSAGE=$(cat slack_response.txt | tail -n 5 | sed '$!s/$/\\n/' | tr -d '\n')
-                   SLACK_MESSAGE1="true"
+                   SLACK_MESSAGE1="true1"
                    echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV
                    if [ "${SLACK_MESSAGE1}" == "true" ]
                    then
@@ -78,10 +73,8 @@ jobs:
                    else
                    notify1="false"
                    echo "export notify1='${notify1}'" >> $BASH_ENV
-                   fi
-            - run: echo $notify1       
+                   fi   
             - notify-snyk-result:
-                   notify: eval "echo $notify1"
 workflows:
     pull_requests:
         jobs:
