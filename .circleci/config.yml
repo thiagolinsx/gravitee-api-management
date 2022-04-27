@@ -44,7 +44,7 @@ jobs:
     publish_prod_docker_images: 
         parameters:
             notify:
-                default: false
+                default: true
                 type: boolean    
         docker:
             - image: cimg/openjdk:17.0.1    
