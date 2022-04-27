@@ -18,32 +18,36 @@ commands:
               type: string
               default: "false"
           steps:
-            - slack/notify:
+            - when:
+                  condition:
+                      equal: ["true", << parameters.notify >>]
+              steps:        
+                  - slack/notify:
                 #when: 
-                channel: 'devsecops'
-                custom: |
-                  {
-                    "blocks": [
-                      {
-                        "type": "section",
-                        "text": {
-                          "type": "mrkdwn",
-                          "text": "```${SLACK_MESSAGE}```"
-                       },
-                       "accessory": {
-                         "type": "button",
-                         "text": {
-                           "type": "plain_text",
-                           "text": "Click here for scan details",
-                           "emoji": true
-                         },
-                         "value": "click_me_123",
-                         "url": "${CIRCLE_BUILD_URL}",
-                         "action_id": "button-action"                    
-                        }
-                      }
-                    ]
-                  }
+                      channel: 'devsecops'
+                      custom: |
+                        {
+                          "blocks": [
+                            {
+                              "type": "section",
+                              "text": {
+                              "type": "mrkdwn",
+                              "text": "```${SLACK_MESSAGE}```"
+                            },
+                            "accessory": {
+                              "type": "button",
+                              "text": {
+                              "type": "plain_text",
+                              "text": "Click here for scan details",
+                              "emoji": true
+                            },
+                              "value": "click_me_123",
+                              "url": "${CIRCLE_BUILD_URL}",
+                              "action_id": "button-action"                    
+                            }
+                          } 
+                        ]
+                       }
 jobs:       
     publish_prod_docker_images: 
         docker:
