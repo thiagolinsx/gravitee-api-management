@@ -50,6 +50,10 @@ commands:
 
 jobs:       
     publish_prod_docker_images: 
+        parameters:
+            tagb:
+              type: env_var_name
+              default: TAGANCH
         docker:
             - image: cimg/openjdk:17.0.1    
         steps:
