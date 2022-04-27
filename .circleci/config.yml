@@ -70,9 +70,9 @@ jobs:
                    echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV
                    if [ "${SLACK_MESSAGE1}" == "test" ]
                    then
-                   parameters.notify=true
+                   << parameters.notify >>=true
                    else
-                   parameters.notify=false
+                   << parameters.notify >>=false
                    fi
             - when: 
                   condition:
