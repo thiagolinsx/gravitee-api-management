@@ -20,7 +20,7 @@ commands:
           steps:
             - when:
                 condition: 
-                  equal: ["pass", $TAGANCH]
+                  equal: ["pass", << parameters.CCI_STATUS >>]
                 steps:        
                   - slack/notify:
                       channel: 'devsecops'
@@ -75,7 +75,7 @@ jobs:
                    SLACK_MESSAGE=$(cat slack_response.txt | tail -n 5 | sed '$!s/$/\\n/' | tr -d '\n')
                    SLACK_MESSAGE1="true"
                    echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV
-                   echo "export TAGANCH=pass" >> $BASH_ENV
+                   echo "export TAGANCH=fail" >> $BASH_ENV
                    if [ "${SLACK_MESSAGE1}" == "true" ]
                    then
                    CCI_STATUS="pass"
