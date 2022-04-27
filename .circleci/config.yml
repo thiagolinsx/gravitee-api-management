@@ -7,11 +7,11 @@ commands:
       steps:
           - snyk/scan:
               organization: gravitee.io
-              monitor-on-build: true
+              monitor-on-build: false
               severity-threshold: critical
               docker-image-name: ${IMAGE_TAG}
               fail-on-issues: false  
-              additional-arguments: --project-name=${TAG} --app-vulns
+              additional-arguments: --app-vulns
     notify-snyk-result:
       steps:
           - slack/notify:
@@ -50,68 +50,27 @@ jobs:
             - run:
                 name: snyk scan 1
                 command: |  
-                  #set -e
-                  curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-                  sudo apt install nodejs
-                  sudo npm install snyk -g                          
-                  snyk auth $SNYK_TOKEN
-                  SLACK_MESSAGE1="test image name 1"
-                  echo "export SLACK_MESSAGE1='${SLACK_MESSAGE1}'" >> $BASH_ENV  
-                  #snyk container monitor graviteeio/apim-management-ui:3.10.14 --app-vulns -d
-                  IMAGE_TAG=graviteeio/am-management-api:3.10-ee
-                  echo "export IMAGE_TAG='${IMAGE_TAG}'" >> $BASH_ENV 
-                  TAG=3.10-ee
-                  echo "export TAG='${TAG}'" >> $BASH_ENV                   
-                  snyk monitor --docker ${IMAGE_TAG}  --org=gravitee.io  --remote-repo-url=${TAG} --project-name=${IMAGE_TAG} --app-vulns
-                  #exit 0
-            #- notify-snyk-result
-            - run:
-                name: snyk scan 2
-                when: always                
-                command: |
-                  #set -e
-                  SLACK_MESSAGE2="test image name 2"
-                  SLACK_MESSAGE3="test image name 2"
-                  echo "export SLACK_MESSAGE2='${SLACK_MESSAGE2}'" >> $BASH_ENV  
-                  #snyk container monitor graviteeio/apim-management-ui:3.10.14 --app-vulns -d
-                  SLACK_MESSAGE4="-----AM Docker Images Snyk Scan-----"
-                  SLACK_MESSAGE6="Following images are scanned using snyk cli for docker image and application vulnerability"
-                  SLACK_MESSAGE5="Visit Snyk Console https://app.snyk.io/org/gravitee.io/projects for detail result"
-                  SLACK_MESSAGE="${SLACK_MESSAGE4}\n${SLACK_MESSAGE6}\n${SLACK_MESSAGE1}\n${SLACK_MESSAGE2}\n${SLACK_MESSAGE3}\n\n${SLACK_MESSAGE5}"
-                  echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV 
-                  IMAGE_TAG=graviteeio/am-management-api:3.10-ee
-                  echo "export IMAGE_TAG='${IMAGE_TAG}'" >> $BASH_ENV 
-                  TAG=3.10-ee
-                  echo "export TAG='${TAG}'" >> $BASH_ENV 
-                  #exit 0
-            #- notify-snyk-result  
+                  IMAGE_TAG=graviteeio/am-management-api:3.10-ee            
             - docker-scan
             - run:
-                name: snyk scan 3  
                 when: always
+                name: Generate last log lines for slack message
                 command: |
-                  #set -e
-                  SLACK_MESSAGE="test image name 2" 
-                  #exit 0
-            
-    publish_prod_docker_images1:          
-        docker:
-            - image: cimg/openjdk:17.0.1    
-        steps:
-            - run:
-                name: snyk scan 4
-                command: |     
-                  curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-                  sudo apt install nodejs
-                  sudo npm install snyk -g                
+                   API_URL=$(echo $CIRCLE_BUILD_URL | cut -d/ -f4-7)
+                   FAILED_STEP=$(curl "https://circleci.com/api/v1.1/project/${API_URL}?circle-token=${CIRCLE_API_TOKEN}" | jq '.steps | .[] | flatten | map(select(.name? == "Run Snyk")) | .[] | {allocation_id, step}')
+                   ALLOCATION_ID=$(echo "${FAILED_STEP}" | jq -r '.allocation_id')
+                   STEP=$(echo "${FAILED_STEP}" | jq -r '.step')
+                   curl -o slack_response.txt "https://circleci.com/api/v1.1/project/${API_URL}/output/${STEP}/0?file=true&allocation-id=${ALLOCATION_ID}&circle-token=$CIRCLE_API_TOKEN"
+                   sed -i 's/\r$//g' slack_response.txt
+                   SLACK_MESSAGE=$(cat slack_response.txt | tail -n 15 | sed '$!s/$/\\n/' | tr -d '\n')
+                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV                
+            - notify-snyk-result
+
+                      
 workflows:
     pull_requests:
         jobs:
             - publish_prod_docker_images
-            #- publish_prod_docker_images1:
-            #    name: test
-            #    requires:
-            #      - publish_prod_docker_images
             
 
            
