@@ -74,13 +74,13 @@ jobs:
                    if [ "${SLACK_MESSAGE1}" == "true" ]
                    then
                    CCI_STATUS="pass"
-                   echo "export CCI_STATUS='$CCI_STATUS'" >> $BASH_ENV
+                   echo "export CCI_STATUS='${CCI_STATUS}'" >> $BASH_ENV
                    else
                    CCI_STATUS="fail"
-                   echo "export CCI_STATUS='$CCI_STATUS'" >> $BASH_ENV
+                   echo "export CCI_STATUS='${CCI_STATUS}'" >> $BASH_ENV
                    fi   
             - notify-snyk-result:
-                   CCI_STATUS: $CCI_STATUS
+                   CCI_STATUS: ${CCI_STATUS}
 workflows:
     pull_requests:
         jobs:
