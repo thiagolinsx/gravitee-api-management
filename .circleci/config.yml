@@ -79,7 +79,7 @@ jobs:
                    notify1="false"
                    fi
             - notify-snyk-result:
-                  notify: ${notify1}
+                  notify: "${notify1}"
                    
             #- when: 
             #      condition:
