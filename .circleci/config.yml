@@ -31,7 +31,7 @@ commands:
                               "type": "section",
                               "text": {
                               "type": "mrkdwn",
-                              "text": "```${notify1}```"
+                              "text": "```${SLACK_MESSAGE}```"
                             },                        
                             "accessory": {
                               "type": "button",
@@ -80,7 +80,8 @@ jobs:
                    notify1="false"
                    echo "export notify1='${notify1}'" >> $BASH_ENV
                    fi
-            - notify-snyk-result                    
+            - notify-snyk-result:
+                   notify: "true"
 workflows:
     pull_requests:
         jobs:
