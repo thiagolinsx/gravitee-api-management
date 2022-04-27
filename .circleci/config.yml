@@ -10,7 +10,7 @@ commands:
               monitor-on-build: false
               severity-threshold: critical
               docker-image-name: ${IMAGE_TAG}
-              fail-on-issues: false  
+              fail-on-issues: true  
               additional-arguments: --app-vulns
     notify-snyk-result:
       steps:
@@ -56,7 +56,7 @@ jobs:
                   echo "export IMAGE_TAG='${IMAGE_TAG}'" >> $BASH_ENV  
             - docker-scan
             - run:
-                when: always
+                #when: always
                 name: Generate last log lines for slack message
                 command: |
                    API_URL=$(echo $CIRCLE_BUILD_URL | cut -d/ -f4-7)
@@ -66,19 +66,20 @@ jobs:
                    curl -o slack_response.txt "https://circleci.com/api/v1.1/project/${API_URL}/output/${STEP}/0?file=true&allocation-id=${ALLOCATION_ID}&circle-token=$CIRCLE_API_TOKEN"
                    sed -i 's/\r$//g' slack_response.txt
                    SLACK_MESSAGE=$(cat slack_response.txt | tail -n 5 | sed '$!s/$/\\n/' | tr -d '\n')
-                   SLACK_MESSAGE1="test"
+                   #SLACK_MESSAGE1="test"
                    echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV
-                   if [ "${SLACK_MESSAGE1}" == "test" ]
-                   then
-                   notify=true
-                   else
-                   notify=false
-                   fi
-            - when: 
-                  condition:
-                      equal: [true, << parameters.notify >>]
-                  steps:
-                      - notify-snyk-result
+                   #if [ "${SLACK_MESSAGE1}" == "test" ]
+                   #then
+                   #notify=true
+                   #else
+                   #notify=false
+                   #fi
+            - notify-snyk-result
+            #- when: 
+            #      condition:
+            #          equal: [true, << parameters.notify >>]
+            #      steps:
+            #          - notify-snyk-result
 
                       
 workflows:
