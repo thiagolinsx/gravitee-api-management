@@ -24,7 +24,29 @@ commands:
                 steps:        
                   - slack/notify:
                       channel: 'devsecops'
-                      template: basic_fail_1
+                      custom: |
+                        {
+                          "blocks": [
+                            {
+                              "type": "section",
+                              "text": {
+                              "type": "mrkdwn",
+                              "text": "```${SLACK_MESSAGE}```"
+                            },                        
+                            "accessory": {
+                              "type": "button",
+                              "text": {
+                              "type": "plain_text",
+                              "text": "Click here for scan details",
+                              "emoji": true
+                            },
+                              "value": "click_me_123",
+                              "url": "${CIRCLE_BUILD_URL}",
+                              "action_id": "button-action"                    
+                            }
+                           }
+                          ]
+                         }
 
 jobs:       
     publish_prod_docker_images: 
