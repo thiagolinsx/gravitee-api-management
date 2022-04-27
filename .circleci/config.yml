@@ -12,14 +12,7 @@ commands:
               docker-image-name: ${IMAGE_TAG}
               fail-on-issues: false  
               additional-arguments: --app-vulns
-    notify-snyk-result:
-      parameters:
-          notify:
-            default: true
-            type: boolean
-      - when: 
-          condition:
-            equal: [test, << parameters.notify >>]            
+    notify-snyk-result:        
           steps:
             - slack/notify:
                 #when: 
@@ -77,8 +70,8 @@ jobs:
                    #else
                    #notify=false
                    #fi
-            - notify-snyk-result:
-                  notify: $SLACK_MESSAGE1
+            - notify-snyk-result
+                  #notify: $SLACK_MESSAGE1
                    
             #- when: 
             #      condition:
