@@ -80,7 +80,7 @@ jobs:
                    echo "export notify1='${notify1}'" >> $BASH_ENV
                    fi   
             - notify-snyk-result:
-                   notify: "true"
+                   notify: "false"
 workflows:
     pull_requests:
         jobs:
