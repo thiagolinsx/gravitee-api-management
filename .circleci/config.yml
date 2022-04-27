@@ -70,13 +70,13 @@ jobs:
                    echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV
                    if [ "${SLACK_MESSAGE1}" == "test" ]
                    then
-                   << parameters.notify >>=true
+                   notify=true
                    else
-                   << parameters.notify >>=false
+                   notify=false
                    fi
             - when: 
                   condition:
-                      equal: [test, ${SLACK_MESSAGE1}]
+                      equal: [true, << parameters.notify >>]
                   steps:
                       - notify-snyk-result
 
