@@ -74,10 +74,12 @@ jobs:
                   SLACK_MESSAGE5="Visit Snyk Console https://app.snyk.io/org/gravitee.io/projects for detail result"
                   SLACK_MESSAGE="${SLACK_MESSAGE4}\n${SLACK_MESSAGE6}\n${SLACK_MESSAGE1}\n${SLACK_MESSAGE2}\n${SLACK_MESSAGE3}\n\n${SLACK_MESSAGE5}"
                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV 
-                  IMAGE_TAG=graviteeio/apim-management-api:3.10.14
+                  IMAGE_TAG=graviteeio/am-management-api:3.10-ee
                   echo "export IMAGE_TAG='${IMAGE_TAG}'" >> $BASH_ENV 
+                  TAG=3.10-ee
+                  echo "export TAG='${TAG}'" >> $BASH_ENV 
                   #exit 0
-            - notify-snyk-result  
+            #- notify-snyk-result  
             - docker-scan
             - run:
                 name: snyk scan 3  
