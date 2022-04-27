@@ -58,6 +58,11 @@ jobs:
                   SLACK_MESSAGE1="test image name 1"
                   echo "export SLACK_MESSAGE1='${SLACK_MESSAGE1}'" >> $BASH_ENV  
                   #snyk container monitor graviteeio/apim-management-ui:3.10.14 --app-vulns -d
+                  IMAGE_TAG=graviteeio/am-management-api:3.10-ee
+                  echo "export IMAGE_TAG='${IMAGE_TAG}'" >> $BASH_ENV 
+                  TAG=3.10-ee
+                  echo "export TAG='${TAG}'" >> $BASH_ENV                   
+                  snyk monitor --docker ${IMAGE_TAG}  --org=gravitee.io  --remote-repo-url=${TAG} --project-name=${IMAGE_TAG} --app-vulns
                   #exit 0
             #- notify-snyk-result
             - run:
