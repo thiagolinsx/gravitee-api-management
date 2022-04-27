@@ -20,7 +20,7 @@ commands:
           steps:
             - when:
                 condition: 
-                  equal: [pass, << parameters.CCI_STATUS >>]
+                  equal: ["pass", << parameters.CCI_STATUS >>]
                 steps:        
                   - slack/notify:
                       channel: 'devsecops'
