@@ -20,7 +20,7 @@ commands:
           steps:
             - when:
                 condition: 
-                  equal: ["pass", << parameters.TAGANCH >>]
+                  equal: ["pass", $TAGANCH]
                 steps:        
                   - slack/notify:
                       channel: 'devsecops'
