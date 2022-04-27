@@ -17,13 +17,13 @@ commands:
             notify:
               type: string
               default: "false"
-          #steps:
+          steps:
           #  - when:
           #        condition:
           #            equal: ["true", << parameters.notify >>]
           #    steps:        
-          #        - run:
-          #             command: echo "test"
+             - run:
+                 command: echo "test"
 
 jobs:       
     publish_prod_docker_images: 
