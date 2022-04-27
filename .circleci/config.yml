@@ -80,7 +80,7 @@ jobs:
                    echo "export CCI_STATUS='${CCI_STATUS}'" >> $BASH_ENV
                    fi   
             - notify-snyk-result:
-                   CCI_STATUS: ${CCI_STATUS}
+                   CCI_STATUS: "pass"
 workflows:
     pull_requests:
         jobs:
