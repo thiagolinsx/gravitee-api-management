@@ -39,7 +39,7 @@ commands:
                       }
                     ]
                   }
-                event: always
+                event: fail
 
 jobs:       
     publish_prod_docker_images:          
