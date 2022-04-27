@@ -75,13 +75,13 @@ jobs:
                    then
                    notify1="true"
                    echo "export notify1='${notify1}'" >> $BASH_ENV
-                   echo ${notify1}
                    else
                    notify1="false"
                    echo "export notify1='${notify1}'" >> $BASH_ENV
                    fi
+            - run: echo $notify1       
             - notify-snyk-result:
-                   notify: "true"
+                   notify: eval "echo $notify1"
 workflows:
     pull_requests:
         jobs:
