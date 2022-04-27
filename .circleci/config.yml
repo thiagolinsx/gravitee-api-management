@@ -41,9 +41,12 @@ commands:
                     ]
                   }
 jobs:       
-    publish_prod_docker_images:          
+    publish_prod_docker_images: 
+        parameters:
+            notify:
+                default: false
+                type: boolean    
         docker:
-            #- image: cimg/base:stable
             - image: cimg/openjdk:17.0.1    
         steps:
             - run:
@@ -67,10 +70,15 @@ jobs:
                    echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV
                    if [ "${SLACK_MESSAGE1}" == "test" ]
                    then
-                   echo "test1!"
+                   notify: true
                    else
-                   echo "test2!"
+                   notify: false
                    fi
+            - when: 
+                  condition:
+                      equal: [true, <<parameters.notify >>]
+                  steps:
+                      - notify-snyk-result
 
                       
 workflows:
