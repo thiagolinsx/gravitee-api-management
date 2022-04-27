@@ -15,6 +15,7 @@ commands:
     notify-snyk-result:
       steps:
           - slack/notify:
+                #when: 
                 channel: 'devsecops'
                 custom: |
                   {
@@ -39,8 +40,6 @@ commands:
                       }
                     ]
                   }
-                event: fail
-
 jobs:       
     publish_prod_docker_images:          
         docker:
