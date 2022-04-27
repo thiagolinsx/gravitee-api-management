@@ -18,12 +18,12 @@ commands:
               type: string
               default: "false"
           steps:
-          #  - when:
-          #        condition:
-          #            equal: ["true", << parameters.notify >>]
-          #    steps:        
-             - run:
-                 command: echo "test"
+            - when:
+                condition:
+                     equal: ["true", << parameters.notify >>]
+                steps:        
+                  - run:
+                      command: echo "test"
 
 jobs:       
     publish_prod_docker_images: 
