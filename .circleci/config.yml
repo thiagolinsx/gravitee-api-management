@@ -76,7 +76,7 @@ jobs:
                    fi
             - when: 
                   condition:
-                      equal: [true, notify]
+                      equal: [true, << parameters.notify >>]
                   steps:
                       - notify-snyk-result
 
