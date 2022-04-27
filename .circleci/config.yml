@@ -11,7 +11,7 @@ commands:
               severity-threshold: critical
               docker-image-name: ${IMAGE_TAG}
               fail-on-issues: false  
-              additional-arguments: --remote-repo-url=${TAG} --project-name=${IMAGE_TAG} --app-vulns
+              additional-arguments: --project-name=${TAG} --app-vulns
     notify-snyk-result:
       steps:
           - slack/notify:
