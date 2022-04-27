@@ -82,7 +82,7 @@ jobs:
                    echo "export notify1='${notify1}'" >> $BASH_ENV
                    fi
             - notify-snyk-result:
-                  notify: "echo ${notify1}"
+                  notify: "true"
                    
             #- when: 
             #      condition:
