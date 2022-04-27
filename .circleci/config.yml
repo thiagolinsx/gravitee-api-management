@@ -15,8 +15,8 @@ commands:
     notify-snyk-result: 
           parameters:
             notify:
-              type: boolean
-              default: false
+              type: string
+              default: "false"
           steps:
             - slack/notify:
                 #when: 
