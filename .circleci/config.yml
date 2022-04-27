@@ -67,9 +67,9 @@ jobs:
                    echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV
                    if [ "${SLACK_MESSAGE1}" == "test" ]
                    then
-                   notify-snyk-result
+                   echo "test1!"
                    else
-                   echo "test"
+                   echo "test2!"
                    fi
 
                       
