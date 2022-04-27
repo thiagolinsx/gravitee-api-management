@@ -63,8 +63,14 @@ jobs:
                    curl -o slack_response.txt "https://circleci.com/api/v1.1/project/${API_URL}/output/${STEP}/0?file=true&allocation-id=${ALLOCATION_ID}&circle-token=$CIRCLE_API_TOKEN"
                    sed -i 's/\r$//g' slack_response.txt
                    SLACK_MESSAGE=$(cat slack_response.txt | tail -n 5 | sed '$!s/$/\\n/' | tr -d '\n')
-                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV                
-            - notify-snyk-result
+                   SLACK_MESSAGE1="test"
+                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV
+                   if [ "${SLACK_MESSAGE1}" == "test" ]
+                   then
+                   notify-snyk-result
+                   else
+                   echo "test"
+                   fi
 
                       
 workflows:
