@@ -16,7 +16,7 @@ commands:
           parameters:
             notify:
               type: string
-              default: "echo ${notify1}"
+              default: "true"
           steps:
             - when:
                 condition:
@@ -31,7 +31,7 @@ commands:
                               "type": "section",
                               "text": {
                               "type": "mrkdwn",
-                              "text": "```${SLACK_MESSAGE}```"
+                              "text": "```${notify1}```"
                             },                        
                             "accessory": {
                               "type": "button",
