@@ -22,8 +22,9 @@ commands:
                 condition:
                      equal: ["true", << parameters.notify >>]
                 steps:        
-                  - run:
-                      command: echo "test"
+                  - slack/notify:
+                      channel: 'devsecops'
+                      template: basic_fail_1
 
 jobs:       
     publish_prod_docker_images: 
@@ -56,7 +57,7 @@ jobs:
                    #notify=false
                    #fi
             - notify-snyk-result:
-                  notify: "true1"
+                  notify: "true"
                    
             #- when: 
             #      condition:
