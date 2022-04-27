@@ -56,7 +56,7 @@ jobs:
                    #notify=false
                    #fi
             - notify-snyk-result:
-                  notify: $SLACK_MESSAGE1
+                  notify: "true"
                    
             #- when: 
             #      condition:
