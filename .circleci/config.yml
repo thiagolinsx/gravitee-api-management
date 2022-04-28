@@ -7,7 +7,7 @@ commands:
       steps:
           - snyk/scan:
               organization: gravitee.io
-              monitor-on-build: false
+              monitor-on-build: true
               severity-threshold: critical
               docker-image-name: graviteeio/apim-management-api:3.10
               fail-on-issues: false  
