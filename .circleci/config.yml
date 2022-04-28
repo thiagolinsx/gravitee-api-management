@@ -12,6 +12,18 @@ commands:
               docker-image-name: graviteeio/apim-management-api:3.16
               fail-on-issues: false  
               additional-arguments: --app-vulns
+    docker-snyk-scan:
+
+      steps:
+          - run:
+                name: Install Snyk CLI
+                command: |
+                    sudo npm install snyk -g                          
+                    snyk auth $SNYK_TOKEN
+          - run:
+                name: Snyk monitor << parameters.docker-image-name >>:<< parameters.version >>
+                command: |
+                    snyk monitor --docker graviteeio/apim-management-api:3.16  --org=gravitee.io  --remote-repo-url=3.16 --project-name=graviteeio/apim-management-api --app-vulns
     notify-snyk-result: 
           parameters:
             CCI_STATUS:
@@ -57,7 +69,7 @@ jobs:
         docker:
             - image: cimg/openjdk:17.0.1    
         steps:
-            - docker-scan
+            - docker-snyk-scan
 workflows:
     pull_requests:
         jobs:
