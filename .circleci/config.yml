@@ -21,7 +21,7 @@ commands:
                     sudo npm install snyk -g                          
                     snyk auth $SNYK_TOKEN
           - run:
-                name: Snyk monitor << parameters.docker-image-name >>:<< parameters.version >>
+                name: Snyk monitor
                 command: |
                     snyk monitor --docker graviteeio/apim-management-api:3.16  --org=gravitee.io  --remote-repo-url=3.16 --project-name=graviteeio/apim-management-api --app-vulns
     notify-snyk-result: 
