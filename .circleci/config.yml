@@ -9,7 +9,7 @@ commands:
               organization: gravitee.io
               monitor-on-build: true
               severity-threshold: critical
-              docker-image-name: graviteeio/apim-management-api:3.16.
+              docker-image-name: graviteeio/apim-management-api:3.16
               fail-on-issues: false  
               additional-arguments: --app-vulns
     notify-snyk-result: 
