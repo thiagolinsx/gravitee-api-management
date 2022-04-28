@@ -30,23 +30,23 @@ commands:
                             {
                               "type": "section",
                               "text": {
-                              "type": "mrkdwn",
-                              "text": "```${SLACK_MESSAGE}```"
-                            },                        
-                            "accessory": {
-                              "type": "button",
-                              "text": {
-                              "type": "plain_text",
-                              "text": "Click here for scan details",
-                              "emoji": true
-                            },
-                              "value": "click_me_123",
-                              "url": "${CIRCLE_BUILD_URL}",
-                              "action_id": "button-action"                    
+                                "type": "mrkdwn",
+                                "text": "```${SLACK_MESSAGE}```"
+                              },                        
+                              "accessory": {
+                                "type": "button",
+                                "text": {
+                                  "type": "plain_text",
+                                  "text": "Click here for scan details",
+                                  "emoji": true
+                                },
+                                "value": "click_me_123",
+                                "url": "${CIRCLE_BUILD_URL}",
+                                "action_id": "button-action"                    
+                              }
                             }
-                           }
                           ]
-                         }
+                        }
 
 jobs:       
     publish_prod_docker_images: 
@@ -60,7 +60,7 @@ jobs:
             - run:
                 name: snyk scan 1
                 command: |  
-                  IMAGE_TAG=graviteeio/am-management-api:3.10-ee 
+                  IMAGE_TAG=graviteeio/apim-management-api:3.10-ee 
                   echo "export IMAGE_TAG='${IMAGE_TAG}'" >> $BASH_ENV  
             - docker-scan
             - run:
