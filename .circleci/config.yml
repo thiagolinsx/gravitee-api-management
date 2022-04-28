@@ -67,7 +67,7 @@ jobs:
               type: env_var_name
               default: TAGANCH
         docker:
-            - image: cimg/openjdk:17.0.1    
+            - image: cimg/node:lts    
         steps:
             - docker-snyk-scan
 workflows:
