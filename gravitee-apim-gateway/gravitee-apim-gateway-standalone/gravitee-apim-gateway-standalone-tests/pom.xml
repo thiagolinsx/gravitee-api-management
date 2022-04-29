@@ -19,23 +19,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
     <parent>
-        <groupId>io.gravitee.apim.gateway</groupId>
-        <artifactId>gravitee-apim-gateway</artifactId>
+        <artifactId>gravitee-apim-gateway-standalone</artifactId>
+        <groupId>io.gravitee.apim.gateway.standalone</groupId>
         <version>3.18.0-SNAPSHOT</version>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.gravitee.apim.gateway.standalone</groupId>
-    <artifactId>gravitee-apim-gateway-standalone</artifactId>
+    <artifactId>gravitee-apim-gateway-standalone-tests</artifactId>
     <packaging>pom</packaging>
-    <name>Gravitee.io APIM - Gateway - Standalone</name>
-
     <modules>
-        <module>gravitee-apim-gateway-standalone-container</module>
-        <module>gravitee-apim-gateway-standalone-distribution</module>
-        <module>gravitee-apim-gateway-standalone-bootstrap</module>
-        <module>gravitee-apim-gateway-standalone-tests</module>
+        <module>gravitee-apim-gateway-standalone-tests-sdk</module>
+        <module>gravitee-apim-gateway-standalone-tests-integration</module>
+        <module>gravitee-apim-gateway-standalone-tests-policies</module>
     </modules>
 </project>

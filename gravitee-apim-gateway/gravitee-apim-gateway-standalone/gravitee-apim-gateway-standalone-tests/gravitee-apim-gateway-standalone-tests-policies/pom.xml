@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2015 The Gravitee team (http://gravitee.io)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>gravitee-apim-gateway-standalone-tests</artifactId>
+        <groupId>io.gravitee.apim.gateway.standalone</groupId>
+        <version>3.18.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>gravitee-apim-gateway-standalone-tests-policies</artifactId>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <workspace>${project.build.directory}/test-classes/gravitee-default</workspace>
+        <workspace.plugins>${workspace}/plugins</workspace.plugins>
+        <workspace.logs>${workspace}/logs</workspace.logs>
+        <gravitee-policy-transformheaders.version>1.10.0</gravitee-policy-transformheaders.version>
+        <gravitee-policy-assign-content.version>1.7.0</gravitee-policy-assign-content.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.gravitee.apim.gateway.standalone</groupId>
+            <artifactId>gravitee-apim-gateway-standalone-tests-sdk</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>io.gravitee.policy</groupId>
+            <artifactId>gravitee-policy-transformheaders</artifactId>
+            <version>${gravitee-policy-transformheaders.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.gravitee.policy</groupId>
+            <artifactId>gravitee-policy-transformheaders</artifactId>
+            <version>${gravitee-policy-transformheaders.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.gravitee.policy</groupId>
+            <artifactId>gravitee-policy-assign-content</artifactId>
+            <version>${gravitee-policy-assign-content.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>unpack-gateway-tests</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeGroupIds>io.gravitee.apim.gateway.standalone</includeGroupIds>
+                            <includeArtifactIds>gravitee-apim-gateway-standalone-tests-sdk</includeArtifactIds>
+                            <includeClassifiers>tests</includeClassifiers>
+                            <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.10</version>
+                <executions>
+                    <execution>
+                        <id>copy-plugins</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <!-- REPOSITORIES -->
+                                <artifactItem>
+                                    <groupId>io.gravitee.policy</groupId>
+                                    <artifactId>gravitee-policy-transformheaders</artifactId>
+                                    <version>${gravitee-policy-transformheaders.version}</version>
+                                    <type>zip</type>
+                                    <overWrite>false</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>io.gravitee.policy</groupId>
+                                    <artifactId>gravitee-policy-assign-content</artifactId>
+                                    <version>${gravitee-policy-assign-content.version}</version>
+                                    <type>zip</type>
+                                    <overWrite>false</overWrite>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${workspace.plugins}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>init-dir</id>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${workspace.logs}"/>
+                                <mkdir dir="${workspace.plugins}"/>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--                    <plugin>-->
+            <!--                        <groupId>org.codehaus.mojo</groupId>-->
+            <!--                        <artifactId>exec-maven-plugin</artifactId>-->
+            <!--                        <version>1.5.0</version>-->
+            <!--                        <executions>-->
+            <!--                            <execution>-->
+            <!--                                <goals>-->
+            <!--                                    <goal>java</goal>-->
+            <!--                                </goals>-->
+            <!--                            </execution>-->
+            <!--                        </executions>-->
+            <!--                        <configuration>-->
+            <!--                            <includeProjectDependencies>true</includeProjectDependencies>-->
+            <!--                            <mainClass>io.gravitee.apim.gateway.standalone.GatewayContainer</mainClass>-->
+            <!--                            <systemProperties>-->
+            <!--                                <systemProperty>-->
+            <!--                                    <key>gravitee.home</key>-->
+            <!--                                    <value>${workspace}</value>-->
+            <!--                                </systemProperty>-->
+            <!--                            </systemProperties>-->
+            <!--                        </configuration>-->
+            <!--                    </plugin>-->
+        </plugins>
+    </build>
+
+</project>
