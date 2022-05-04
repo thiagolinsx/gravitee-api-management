@@ -3,7 +3,7 @@ version: 2.1
 slack-pass-fail-post-step: &slack-pass-fail-post-step
   post-steps:
     - slack/notify:
-        channel: 'api-management_team_notifications'
+        channel: 'devsecops'
         custom: |
           {
             "text": "",
@@ -12,7 +12,7 @@ slack-pass-fail-post-step: &slack-pass-fail-post-step
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "❌ *Failure* #${CIRCLE_JOB} `${CIRCLE_INTERNAL_TASK_DATA}` on `${CIRCLE_BRANCH}`"
+                  "text": "❌ *Failure* #${CIRCLE_JOB} `${CIRCLE_PROJECT_USERNAME}` on `${CIRCLE_BRANCH}`"
                 }
               },
               {
@@ -32,7 +32,7 @@ slack-pass-fail-post-step: &slack-pass-fail-post-step
           }
         event: fail
     - slack/notify:
-        channel: 'api-management_team_notifications'
+        channel: 'devsecops'
         custom: |
           {
             "text": "",
@@ -41,7 +41,7 @@ slack-pass-fail-post-step: &slack-pass-fail-post-step
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "✅ *Success* #${CIRCLE_JOB} `${CIRCLE_INTERNAL_TASK_DATA}` on `${CIRCLE_BRANCH}`"
+                  "text": "✅ *Success* #${CIRCLE_JOB} `${CIRCLE_PROJECT_USERNAME}` on `${CIRCLE_BRANCH}`"
                 }
               },
               {
@@ -81,7 +81,7 @@ jobs:
       - run:
           name: Success
           command: |
-            exit 1
+            exit 0
 workflows:
   version: 2
   workflow:
