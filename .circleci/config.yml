@@ -89,8 +89,8 @@ workflows:
       - build:
           #context: 
           #  - slack
-          #<<: *slack-pass-fail-post-step
-      - test-am-job:
+          <<: *slack-pass-fail-post-step
+      - gravitee/d_am_release:
           #context: [slack]
           requires:
             - build
