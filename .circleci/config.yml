@@ -44,7 +44,7 @@ jobs:
       - run:
           name: Success
           command: |
-            exit 0
+            exit 1
   last-job:
     docker:
       - image: cimg/base:stable
