@@ -12,7 +12,7 @@ slack-fail-post-step: &slack-fail-post-step
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "❌ *Failure* #${CIRCLE_BUILD_NUM} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
+                  "text": "AM Release Job Completed - #${CIRCLE_BUILD_NUM} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
                 }
               },
               {
@@ -30,7 +30,7 @@ slack-fail-post-step: &slack-fail-post-step
               }
             ]
           }
-        event: fail
+        event: always
 
 orbs:
   slack: circleci/slack@4.1.1
@@ -53,7 +53,7 @@ jobs:
       - run:
           name: Success
           command: |
-            exit 1
+            exit 0
 workflows:
   version: 2
   workflow:
