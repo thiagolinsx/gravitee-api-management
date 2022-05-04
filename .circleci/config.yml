@@ -59,8 +59,8 @@ workflows:
   workflow:
     jobs:
       - build:
-          context: 
-            - slack
+          #context: 
+          #  - slack
           <<: *slack-fail-post-step
       - last-job:
           context: [slack]
