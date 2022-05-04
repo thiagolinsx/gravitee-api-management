@@ -90,7 +90,7 @@ workflows:
           #context: 
           #  - slack
           <<: *slack-pass-fail-post-step
-      - gravitee/d_am_release:
+      - d_am_release:
           #context: [slack]
           requires:
             - build
