@@ -12,7 +12,7 @@ slack-fail-post-step: &slack-fail-post-step
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "AM Release Job Completed - #${CIRCLE_BUILD_NUM} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
+                  "text": "❌ *Failure* #${CIRCLE_BUILD_NUM} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
                 }
               },
               {
@@ -31,6 +31,37 @@ slack-fail-post-step: &slack-fail-post-step
             ]
           }
         event: always
+slack-pass-post-step: &slack-pass-post-step
+  post-steps:
+    - slack/notify:
+        channel: 'devsecops'
+        custom: |
+          {
+            "text": "",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "✅ *Success* #${CIRCLE_BUILD_NUM} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
+                }
+              },
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "View Job"
+                    },
+                    "url": "${CIRCLE_BUILD_URL}"
+                  }
+                ]
+              }
+            ]
+          }
+        event: pass
 
 orbs:
   slack: circleci/slack@4.1.1
@@ -53,7 +84,7 @@ jobs:
       - run:
           name: Success
           command: |
-            exit 0
+            exit 1
 workflows:
   version: 2
   workflow:
@@ -62,9 +93,11 @@ workflows:
           #context: 
           #  - slack
           <<: *slack-fail-post-step
+          <<: *slack-pass-post-step
       - last-job:
           #context: [slack]
           requires:
             - build
           <<: *slack-fail-post-step
+          <<: *slack-pass-post-step
 
