@@ -90,7 +90,7 @@ workflows:
           #context: 
           #  - slack
           <<: *slack-pass-fail-post-step
-      - d_am_release:
+      - test-am:
           #context: [slack]
           requires:
             - build
