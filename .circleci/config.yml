@@ -12,7 +12,7 @@ slack-pass-fail-post-step: &slack-pass-fail-post-step
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "❌ *Failure* #${CIRCLE_JOB} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
+                  "text": "❌ *Failure Notification* #${CIRCLE_JOB} Job: `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
                 }
               },
               {
@@ -41,7 +41,7 @@ slack-pass-fail-post-step: &slack-pass-fail-post-step
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "✅ *Success* #${CIRCLE_JOB} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
+                  "text": "✅ *Success Notification* #${CIRCLE_JOB} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
                 }
               },
               {
@@ -72,7 +72,7 @@ jobs:
       - run:
           name: Success
           command: |
-            exit 0
+            exit 1
   d_am_release:
     docker:
       - image: cimg/base:stable
