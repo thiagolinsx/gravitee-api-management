@@ -105,7 +105,7 @@ jobs:
       - run:
           name: Success
           command: |
-            exit 1
+            exit 0
   last-job:
     docker:
       - image: cimg/base:stable
@@ -114,7 +114,7 @@ jobs:
       - run:
           name: Success
           command: |
-            exit 0
+            exit 1
 workflows:
   version: 2
   workflow:
