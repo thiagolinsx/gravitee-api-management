@@ -32,7 +32,7 @@ slack-pass-fail-post-step: &slack-pass-fail-post-step
           }
         event: fail
     - slack/notify:
-        channel: 'devsecops'
+        channel: 'api-management_team_notifications'
         custom: |
           {
             "text": "",
