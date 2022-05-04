@@ -12,7 +12,7 @@ slack-pass-fail-post-step: &slack-pass-fail-post-step
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "❌ *Failure* #${CIRCLE_JOB} `${CIRCLE_PROJECT_USERNAME}` on `${CIRCLE_BRANCH}`"
+                  "text": "❌ *Failure* #${CIRCLE_JOB} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
                 }
               },
               {
@@ -41,7 +41,7 @@ slack-pass-fail-post-step: &slack-pass-fail-post-step
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "✅ *Success* #${CIRCLE_JOB} `${CIRCLE_PROJECT_USERNAME}` on `${CIRCLE_BRANCH}`"
+                  "text": "✅ *Success* #${CIRCLE_JOB} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
                 }
               },
               {
