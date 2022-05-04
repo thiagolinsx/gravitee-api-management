@@ -30,7 +30,7 @@ slack-fail-post-step: &slack-fail-post-step
               }
             ]
           }
-        event: always
+        event: fail
 slack-pass-post-step: &slack-pass-post-step
   post-steps:
     - slack/notify:
