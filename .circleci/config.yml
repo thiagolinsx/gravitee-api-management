@@ -92,12 +92,12 @@ workflows:
       - build:
           #context: 
           #  - slack
-          <<: *slack-fail-post-step
+          #<<: *slack-fail-post-step
           <<: *slack-pass-post-step
       - last-job:
           #context: [slack]
           requires:
             - build
-          <<: *slack-fail-post-step
+          #<<: *slack-fail-post-step
           <<: *slack-pass-post-step
 
