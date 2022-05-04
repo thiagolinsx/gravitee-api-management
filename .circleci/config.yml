@@ -2,12 +2,38 @@ version: 2.1
 
 slack-fail-post-step: &slack-fail-post-step
   post-steps:
-    - slack/status:
+    - slack/notify:
         channel: 'devsecops'
-        fail_only: true
+        custom: |
+          {
+            "text": "",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "❌ *Failure* #${CIRCLE_BUILD_NUM} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
+                }
+              },
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "View Job"
+                    },
+                    "url": "${CIRCLE_BUILD_URL}"
+                  }
+                ]
+              }
+            ]
+          }
+        event: fail
 
 orbs:
-  slack: circleci/slack@3.4.2
+  slack: circleci/slack@4.1.1
 
 jobs:
   build:
@@ -28,14 +54,45 @@ jobs:
           name: Success
           command: |
             exit 0
-  
 workflows:
   version: 2
   workflow:
     jobs:
-      - build: *slack-fail-post-step
+      - build:
+          context: 
+            - slack
+          <<: *slack-fail-post-step
       - last-job:
+          context: [slack]
           requires:
             - build
           post-steps:
-            - slack/status
+            - slack/notify:
+                channel: 'devsecops'
+                custom: |
+                  {
+                    "text": "",
+                    "blocks": [
+                      {
+                        "type": "section",
+                        "text": {
+                          "type": "mrkdwn",
+                          "text": "✅ *Success* #${CIRCLE_BUILD_NUM} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
+                        }
+                      },
+                      {
+                        "type": "actions",
+                        "elements": [
+                          {
+                            "type": "button",
+                            "text": {
+                              "type": "plain_text",
+                              "text": "View Job"
+                            },
+                            "url": "${CIRCLE_BUILD_URL}"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                event: always
