@@ -1,95 +1,40 @@
 version: 2.1
+
+slack-fail-post-step: &slack-fail-post-step
+  post-steps:
+    - slack/status:
+        fail_only: true
+
 orbs:
-    slack: circleci/slack@4.8.1
-    snyk: snyk/snyk@1.1.2
-commands:  
-    docker-scan:
-      steps:
-          - snyk/scan:
-              organization: gravitee.io
-              monitor-on-build: false
-              severity-threshold: critical
-              docker-image-name: ${IMAGE_TAG}
-              fail-on-issues: false  
-              additional-arguments: --app-vulns
-    notify-snyk-result: 
-          parameters:
-            CCI_STATUS:
-              type: string
-              default: "fail"
-          steps:
-            - when:
-                condition: 
-                  equal: ["pass", << parameters.CCI_STATUS >>]
-                steps:        
-                  - slack/notify:
-                      channel: 'devsecops'
-                      custom: |
-                        {
-                          "blocks": [
-                            {
-                              "type": "section",
-                              "text": {
-                              "type": "mrkdwn",
-                              "text": "```${SLACK_MESSAGE}```"
-                            },                        
-                            "accessory": {
-                              "type": "button",
-                              "text": {
-                              "type": "plain_text",
-                              "text": "Click here for scan details",
-                              "emoji": true
-                            },
-                              "value": "click_me_123",
-                              "url": "${CIRCLE_BUILD_URL}",
-                              "action_id": "button-action"                    
-                            }
-                           }
-                          ]
-                         }
+  slack: circleci/slack@3.4.2
 
-jobs:       
-    publish_prod_docker_images: 
-        parameters:
-            tagb:
-              type: env_var_name
-              default: TAGANCH
-        docker:
-            - image: cimg/openjdk:17.0.1    
-        steps:
-            - run:
-                name: snyk scan 1
-                command: |  
-                  IMAGE_TAG=graviteeio/am-management-api:3.10-ee 
-                  echo "export IMAGE_TAG='${IMAGE_TAG}'" >> $BASH_ENV  
-            - docker-scan
-            - run:
-                name: Generate last log lines for slack message
-                command: |
-                   API_URL=$(echo $CIRCLE_BUILD_URL | cut -d/ -f4-7)
-                   FAILED_STEP=$(curl "https://circleci.com/api/v1.1/project/${API_URL}?circle-token=${CIRCLE_API_TOKEN}" | jq '.steps | .[] | flatten | map(select(.name? == "Run Snyk")) | .[] | {allocation_id, step}')
-                   ALLOCATION_ID=$(echo "${FAILED_STEP}" | jq -r '.allocation_id')
-                   STEP=$(echo "${FAILED_STEP}" | jq -r '.step')
-                   curl -o slack_response.txt "https://circleci.com/api/v1.1/project/${API_URL}/output/${STEP}/0?file=true&allocation-id=${ALLOCATION_ID}&circle-token=$CIRCLE_API_TOKEN"
-                   sed -i 's/\r$//g' slack_response.txt
-                   SLACK_MESSAGE=$(cat slack_response.txt | tail -n 5 | sed '$!s/$/\\n/' | tr -d '\n')
-                   SLACK_MESSAGE1="true"
-                   echo "export SLACK_MESSAGE='${SLACK_MESSAGE}'" >> $BASH_ENV
-                   echo "export TAGANCH=fail" >> $BASH_ENV
-                   if [ "${SLACK_MESSAGE1}" == "true" ]
-                   then
-                   CCI_STATUS="pass"
-                   echo "export CCI_STATUS='${CCI_STATUS}'" >> $BASH_ENV
-                   else
-                   CCI_STATUS="fail"
-                   echo "export CCI_STATUS='${CCI_STATUS}'" >> $BASH_ENV
-                   fi   
-            - notify-snyk-result:
-                   CCI_STATUS: "pass"
+jobs:
+  build:
+    docker:
+      - image: cimg/base:stable
+      
+    steps:
+      - run:
+          name: Success
+          command: |
+            exit 0
+  last-job:
+    docker:
+      - image: cimg/base:stable
+      
+    steps:
+      - run:
+          name: Success
+          command: |
+            exit 0
+  
 workflows:
-    pull_requests:
-        jobs:
-            - publish_prod_docker_images
-            
-
-           
+  version: 2
+  workflow:
+    jobs:
+      - build: *slack-fail-post-step
+      - last-job:
+          requires:
+            - build
+          post-steps:
+            - slack/status
