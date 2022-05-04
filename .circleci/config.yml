@@ -1,9 +1,9 @@
 version: 2.1
 
-slack-fail-post-step: &slack-fail-post-step
+slack-pass-fail-post-step: &slack-pass-fail-post-step
   post-steps:
     - slack/notify:
-        channel: 'devsecops'
+        channel: 'api-management_team_notifications'
         custom: |
           {
             "text": "",
@@ -60,39 +60,6 @@ slack-fail-post-step: &slack-fail-post-step
             ]
           }
         event: pass        
-        
-slack-pass-post-step: &slack-pass-post-step
-  post-steps:
-    - slack/notify:
-        channel: 'devsecops'
-        custom: |
-          {
-            "text": "",
-            "blocks": [
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "✅ *Success* #${CIRCLE_JOB} `${CIRCLE_INTERNAL_TASK_DATA}` on `${CIRCLE_BRANCH}`"
-                }
-              },
-              {
-                "type": "actions",
-                "elements": [
-                  {
-                    "type": "button",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "View Job"
-                    },
-                    "url": "${CIRCLE_BUILD_URL}"
-                  }
-                ]
-              }
-            ]
-          }
-        event: pass
-
 orbs:
   slack: circleci/slack@4.1.1
 
@@ -122,12 +89,11 @@ workflows:
       - build:
           #context: 
           #  - slack
-          <<: *slack-fail-post-step
-          #<<: *slack-pass-post-step
+          <<: *slack-pass-fail-post-step
       - last-job:
           #context: [slack]
           requires:
             - build
-          <<: *slack-fail-post-step
-          #<<: *slack-pass-post-step
+          <<: *slack-pass-fail-post-step
+
 
