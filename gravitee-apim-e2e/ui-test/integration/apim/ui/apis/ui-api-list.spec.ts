@@ -41,7 +41,7 @@ describe('API List feature', () => {
     cy.contains('Home board');
   });
 
-  it(`Visit Search Apis`, () => {
+  xit(`Visit Search Apis`, () => {
     cy.visit(`${Cypress.env('managementUI')}/#!/environments/DEFAULT/apis/`);
     cy.contains(createdApi.name);
   });
